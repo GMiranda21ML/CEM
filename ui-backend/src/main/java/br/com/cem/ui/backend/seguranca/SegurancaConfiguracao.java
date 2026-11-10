@@ -1,34 +1,22 @@
 package br.com.cem.ui.backend.seguranca;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
-import br.com.cem.dominio.Autorizacao;
-
+import dev.sauloaraujo.d5.framework.ui.Backend;
 import dev.sauloaraujo.d5.framework.ui.seguranca.SegurancaConfiguracaoAbstrata;
 
 @Configuration
 public class SegurancaConfiguracao extends SegurancaConfiguracaoAbstrata {
+	// Autocadastro de aluno e aceite de convite acontecem sem login.
+	private static final String[] PUBLICAS = { "/" + Backend.PREFIXO + "acesso/usuario/criar-conta",
+			"/" + Backend.PREFIXO + "acesso/convite/verificacao", "/" + Backend.PREFIXO + "acesso/convite/aceitar" };
+
 	@Override
 	protected void autorizar(
 			AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry autorizacao) {
+		autorizacao.requestMatchers(PUBLICAS).permitAll();
 		autorizacao.requestMatchers(BACKEND).authenticated();
-	}
-
-	@Bean
-	UserDetailsService usuarios(PasswordEncoder codificadorSenha) {
-		var administrador = User.withUsername("a").password(codificadorSenha.encode("a"))
-				.authorities(Autorizacao.ADMINISTRADOR.name()).build();
-
-		var usuario = User.withUsername("u").password(codificadorSenha.encode("u"))
-				.authorities(Autorizacao.ALUNO.name()).build();
-
-		return new InMemoryUserDetailsManager(administrador, usuario);
 	}
 }

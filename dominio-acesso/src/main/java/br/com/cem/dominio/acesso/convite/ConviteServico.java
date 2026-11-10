@@ -126,19 +126,17 @@ public final class ConviteServico extends AgregadoServicoAbstrato<ConviteIdentif
 		repositorio.alterar(convite.cancelar());
 	}
 
+	/** Confere o código sem criar a conta. Ação pública, sem autenticação. */
+	public Convite verificar(ConviteEmail emailInstitucional, ConviteCodigo codigo) {
+		return validarCodigo(emailInstitucional, codigo);
+	}
+
 	/** Valida o código e cria a conta do convidado. Ação pública, sem autenticação. */
 	public Usuario aceitar(ConviteEmail emailInstitucional, ConviteCodigo codigo, String nome, UsuarioSenha senha) {
-		Objects.requireNonNull(emailInstitucional);
-		Objects.requireNonNull(codigo);
 		Objects.requireNonNull(nome);
 		Objects.requireNonNull(senha);
 
-		var conviteEncontrado = repositorio.buscarPendentePorEmail(emailInstitucional);
-		Validate.isTrue(conviteEncontrado.isPresent(), CONVITE_INEXISTENTE_PARA_EMAIL_MODELO, emailInstitucional);
-		var convite = conviteEncontrado.get();
-
-		Validate.isTrue(convite.getCodigo().equals(codigo), CODIGO_INVALIDO);
-		Validate.isTrue(!convite.estaExpirado(LocalDateTime.now()), CONVITE_EXPIRADO);
+		var convite = validarCodigo(emailInstitucional, codigo);
 
 		var usuario = new Usuario(Optional.empty(), nome, new UsuarioEmail(emailInstitucional.toString()), senha,
 				convite.getPapel(), convite.getCurso(), null, UsuarioSituacao.ATIVO);
@@ -147,6 +145,20 @@ public final class ConviteServico extends AgregadoServicoAbstrato<ConviteIdentif
 		repositorio.alterar(convite.aceitar());
 
 		return usuarioCriado;
+	}
+
+	private Convite validarCodigo(ConviteEmail emailInstitucional, ConviteCodigo codigo) {
+		Objects.requireNonNull(emailInstitucional);
+		Objects.requireNonNull(codigo);
+
+		var conviteEncontrado = repositorio.buscarPendentePorEmail(emailInstitucional);
+		Validate.isTrue(conviteEncontrado.isPresent(), CONVITE_INEXISTENTE_PARA_EMAIL_MODELO, emailInstitucional);
+		var convite = conviteEncontrado.get();
+
+		Validate.isTrue(convite.getCodigo().equals(codigo), CODIGO_INVALIDO);
+		Validate.isTrue(!convite.estaExpirado(LocalDateTime.now()), CONVITE_EXPIRADO);
+
+		return convite;
 	}
 
 	private void enviarCodigo(Convite convite) {
