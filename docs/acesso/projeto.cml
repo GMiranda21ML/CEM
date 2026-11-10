@@ -80,8 +80,8 @@ BoundedContext acesso implements acesso {
 				@Convite buscar(@ConviteIdentificador identificador);
 				void excluir(@ConviteIdentificador identificador);
 
-				// inclui e envia o e-mail com o código de verificação
-				@Convite convidar(@Convite agregado);
+				// monta o convite com um código gerado, inclui e envia o e-mail com esse código
+				@Convite convidar(@ConviteEmail emailInstitucional, Autorizacao papel, String curso);
 				void reenviar(@ConviteIdentificador identificador);
 				void cancelar(@ConviteIdentificador identificador);
 				@Usuario aceitar(@ConviteEmail emailInstitucional, @ConviteCodigo codigo, String nome, @UsuarioSenha senha);

@@ -88,11 +88,17 @@ public final class ConviteServico extends AgregadoServicoAbstrato<ConviteIdentif
 				EMAIL_CADASTRADO_MODELO);
 	}
 
-	/** Inclui o convite e envia o e-mail com o código de verificação. */
-	public Convite convidar(Convite agregado) {
-		Objects.requireNonNull(agregado);
+	/** Monta o convite com um código recém-gerado, inclui e envia o e-mail com esse código. */
+	public Convite convidar(ConviteEmail emailInstitucional, Autorizacao papel, String curso) {
+		Objects.requireNonNull(emailInstitucional);
+		Objects.requireNonNull(papel);
+		Objects.requireNonNull(curso);
 
-		var convite = incluir(agregado);
+		var agora = LocalDateTime.now();
+		var novoConvite = new Convite(Optional.empty(), emailInstitucional, papel, curso, gerarCodigo(), agora,
+				agora.plusDays(Convite.VALIDADE_DIAS), ConviteSituacao.AGUARDANDO_ACEITE);
+
+		var convite = incluir(novoConvite);
 		enviarCodigo(convite);
 		return convite;
 	}

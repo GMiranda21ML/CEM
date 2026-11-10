@@ -9,7 +9,7 @@ Funcionalidade: Convite de coordenador e de professor
 
   Cenário: Administrador não pode convidar um professor
     Quando o administrador tenta convidar "rodrigo.alves@cem.edu.br" para professor do curso "Ciência da Computação"
-    Então a tentativa é recusada
+    Então o convite é recusado
 
   Cenário: Coordenador convida um professor do seu curso
     Quando o coordenador convida "rodrigo.alves@cem.edu.br" para professor do curso "Ciência da Computação"
@@ -17,12 +17,12 @@ Funcionalidade: Convite de coordenador e de professor
 
   Cenário: Coordenador não pode convidar outro coordenador
     Quando o coordenador tenta convidar "novo.coordenador@cem.edu.br" para coordenador do curso "Ciência da Computação"
-    Então a tentativa é recusada
+    Então o convite é recusado
 
   Cenário: Não convidar um e-mail que já tem conta
-    Dado que "marta.siqueira@cem.edu.br" já tem uma conta
+    Dado que já existe uma conta com o e-mail "marta.siqueira@cem.edu.br"
     Quando o administrador tenta convidar "marta.siqueira@cem.edu.br" para coordenador do curso "Ciência da Computação"
-    Então a tentativa é recusada
+    Então o convite é recusado
 
   Cenário: Reenviar um convite aguardando aceite
     Dado que existe um convite para "beatriz.lopes@cem.edu.br" aguardando aceite com código "123456"
@@ -37,7 +37,7 @@ Funcionalidade: Convite de coordenador e de professor
   Cenário: Não cancelar um convite já aceito
     Dado que existe um convite para "marta.siqueira@cem.edu.br" aceito
     Quando tenta-se cancelar o convite de "marta.siqueira@cem.edu.br"
-    Então a tentativa é recusada
+    Então o convite é recusado
 
   Cenário: Aceitar um convite com e-mail e código corretos
     Dado que existe um convite para "beatriz.lopes@cem.edu.br" aguardando aceite com código "423037"
@@ -48,14 +48,14 @@ Funcionalidade: Convite de coordenador e de professor
   Cenário: Não aceitar um convite com código incorreto
     Dado que existe um convite para "beatriz.lopes@cem.edu.br" aguardando aceite com código "423037"
     Quando "beatriz.lopes@cem.edu.br" tenta aceitar o convite com o código "000000"
-    Então a tentativa é recusada
+    Então o convite é recusado
 
   Cenário: Não aceitar um convite expirado
     Dado que existe um convite para "beatriz.lopes@cem.edu.br" aguardando aceite com código "423037" enviado há 8 dias
     Quando "beatriz.lopes@cem.edu.br" tenta aceitar o convite com o código "423037"
-    Então a tentativa é recusada
+    Então o convite é recusado
 
   Cenário: Não aceitar um convite já cancelado
     Dado que existe um convite para "beatriz.lopes@cem.edu.br" cancelado
     Quando "beatriz.lopes@cem.edu.br" tenta aceitar o convite
-    Então a tentativa é recusada
+    Então o convite é recusado

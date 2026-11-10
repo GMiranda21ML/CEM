@@ -15,4 +15,4 @@ Funcionalidade: Domínio de e-mail liberado para autocadastro de aluno
   Cenário: Apenas coordenador libera domínio de e-mail
     Dado que o domínio "aluno.cem.edu.br" não está liberado
     Quando um professor tenta liberar o domínio "aluno.cem.edu.br"
-    Então a tentativa é recusada
+    Então a liberação é recusada

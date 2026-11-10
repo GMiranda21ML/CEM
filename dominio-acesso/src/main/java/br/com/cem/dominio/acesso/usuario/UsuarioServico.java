@@ -76,7 +76,9 @@ public final class UsuarioServico extends AgregadoServicoAbstrato<UsuarioIdentif
 		validarInexistencia(email -> repositorio.existePorEmail(email, agregado.getIdentificador()),
 				agregado.getEmailInstitucional(), EMAIL_EXISTENTE_MODELO);
 
-		if (agregado.getPapel() == Autorizacao.ALUNO) {
+		// Só a inclusão exige domínio liberado: removê-lo depois não afeta contas já criadas (RN009),
+		// e o e-mail não muda numa alteração (validarAlteracao garante isso).
+		if (agregado.getIdentificador().isEmpty() && agregado.getPapel() == Autorizacao.ALUNO) {
 			var dominio = new DominioEmailDominio(agregado.getEmailInstitucional().getDominio());
 			validarExistencia(dominioEmailRepositorio::existePorIdentificador, dominio, DOMINIO_NAO_LIBERADO_MODELO);
 		}
