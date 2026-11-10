@@ -24,6 +24,11 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>dev.sauloaraujo</groupId>
 			<artifactId>d5-framework-infraestrutura-teste</artifactId>
 			<type>pom</type>
