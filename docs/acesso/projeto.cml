@@ -8,5 +8,153 @@ ContextMap {
 
 BoundedContext acesso implements acesso {
 	Module acesso {
+		Aggregate DominioEmail {
+			Entity DominioEmail {
+				aggregateRoot
+
+				-DominioEmailDominio dominio key
+
+				Repository DominioEmailRepository {
+					@DominioEmail incluir(@DominioEmail agregado);
+					boolean existePorIdentificador(@DominioEmailDominio identificador);
+					@DominioEmail buscarPorIdentificador(@DominioEmailDominio identificador);
+					void excluir(@DominioEmailDominio identificador);
+				}
+			}
+
+			// natural
+			ValueObject DominioEmailDominio {
+				String valor
+			}
+
+			Service DominioEmailServico {
+				@DominioEmail incluir(@DominioEmail agregado);
+				@DominioEmail buscar(@DominioEmailDominio identificador);
+				void excluir(@DominioEmailDominio identificador);
+			}
+		}
+
+		Aggregate Convite {
+			Entity Convite {
+				aggregateRoot
+
+				-ConviteIdentificador identificador key
+				ConviteEmail emailInstitucional
+				Autorizacao papel
+				ConviteCurso curso
+				ConviteCodigo codigo
+				DateTime enviadoEm
+				DateTime validoAte
+				ConviteSituacao situacao
+
+				Repository ConviteRepository {
+					@Convite incluir(@Convite agregado);
+					boolean existePorIdentificador(@ConviteIdentificador identificador);
+					@Convite buscarPorIdentificador(@ConviteIdentificador identificador);
+					void alterar(@Convite agregado);
+					void excluir(@ConviteIdentificador identificador);
+
+					boolean existePendentePorEmail(@ConviteEmail emailInstitucional);
+					@Convite buscarPendentePorEmail(@ConviteEmail emailInstitucional);
+				}
+			}
+
+			enum ConviteSituacao {
+				AGUARDANDO_ACEITE, ACEITO, CANCELADO
+			}
+
+			// artificial
+			ValueObject ConviteIdentificador {
+				String valor
+			}
+
+			ValueObject ConviteEmail {
+				String valor
+			}
+
+			ValueObject ConviteCurso {
+				String valor
+			}
+
+			ValueObject ConviteCodigo {
+				String valor
+			}
+
+			Service ConviteServico {
+				@Convite incluir(@Convite agregado);
+				@Convite buscar(@ConviteIdentificador identificador);
+				void excluir(@ConviteIdentificador identificador);
+
+				void reenviar(@ConviteIdentificador identificador);
+				void cancelar(@ConviteIdentificador identificador);
+				@Usuario aceitar(@ConviteEmail emailInstitucional, @ConviteCodigo codigo, @UsuarioNome nome, @UsuarioSenha senha);
+			}
+		}
+
+		Aggregate Usuario {
+			Entity Usuario {
+				aggregateRoot
+
+				-UsuarioIdentificador identificador key
+				UsuarioNome nome
+				UsuarioEmail emailInstitucional
+				UsuarioSenha senha
+				Autorizacao papel
+				nullable UsuarioCurso curso
+				nullable UsuarioCampus campus
+				UsuarioSituacao situacao
+
+				Repository UsuarioRepository {
+					@Usuario incluir(@Usuario agregado);
+					boolean existePorIdentificador(@UsuarioIdentificador identificador);
+					@Usuario buscarPorIdentificador(@UsuarioIdentificador identificador);
+					void alterar(@Usuario agregado);
+					void excluir(@UsuarioIdentificador identificador);
+
+					boolean existePorEmail(@UsuarioEmail emailInstitucional);
+					@Usuario buscarPorEmail(@UsuarioEmail emailInstitucional);
+				}
+			}
+
+			enum UsuarioSituacao {
+				ATIVO, INATIVO
+			}
+
+			// artificial
+			ValueObject UsuarioIdentificador {
+				String valor
+			}
+
+			ValueObject UsuarioNome {
+				String valor
+			}
+
+			// natural
+			ValueObject UsuarioEmail {
+				String valor
+			}
+
+			ValueObject UsuarioSenha {
+				String valor
+			}
+
+			ValueObject UsuarioCurso {
+				String valor
+			}
+
+			ValueObject UsuarioCampus {
+				String valor
+			}
+
+			Service UsuarioServico {
+				@Usuario incluir(@Usuario agregado);
+				@Usuario buscar(@UsuarioIdentificador identificador);
+				void alterar(@Usuario agregado);
+				void excluir(@UsuarioIdentificador identificador);
+
+				void inativar(@UsuarioIdentificador identificador);
+				void reativar(@UsuarioIdentificador identificador);
+			}
+		}
 	}
 }
