@@ -1,5 +1,5 @@
 package br.com.cem.dominio;
 
 public enum Autorizacao {
-	ADMINISTRADOR, USUARIO
+	ADMINISTRADOR, COORDENADOR, PROFESSOR, ALUNO
 }

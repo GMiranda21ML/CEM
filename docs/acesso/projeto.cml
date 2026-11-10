@@ -41,7 +41,7 @@ BoundedContext acesso implements acesso {
 				-ConviteIdentificador identificador key
 				ConviteEmail emailInstitucional
 				Autorizacao papel
-				ConviteCurso curso
+				String curso
 				ConviteCodigo codigo
 				DateTime enviadoEm
 				DateTime validoAte
@@ -72,22 +72,19 @@ BoundedContext acesso implements acesso {
 				String valor
 			}
 
-			ValueObject ConviteCurso {
-				String valor
-			}
-
 			ValueObject ConviteCodigo {
 				String valor
 			}
 
 			Service ConviteServico {
-				@Convite incluir(@Convite agregado);
 				@Convite buscar(@ConviteIdentificador identificador);
 				void excluir(@ConviteIdentificador identificador);
 
+				// inclui e envia o e-mail com o código de verificação
+				@Convite convidar(@Convite agregado);
 				void reenviar(@ConviteIdentificador identificador);
 				void cancelar(@ConviteIdentificador identificador);
-				@Usuario aceitar(@ConviteEmail emailInstitucional, @ConviteCodigo codigo, @UsuarioNome nome, @UsuarioSenha senha);
+				@Usuario aceitar(@ConviteEmail emailInstitucional, @ConviteCodigo codigo, String nome, @UsuarioSenha senha);
 			}
 		}
 
@@ -96,12 +93,12 @@ BoundedContext acesso implements acesso {
 				aggregateRoot
 
 				-UsuarioIdentificador identificador key
-				UsuarioNome nome
+				String nome
 				UsuarioEmail emailInstitucional
 				UsuarioSenha senha
 				Autorizacao papel
-				nullable UsuarioCurso curso
-				nullable UsuarioCampus campus
+				nullable String curso
+				nullable String campus
 				UsuarioSituacao situacao
 
 				Repository UsuarioRepository {
@@ -125,10 +122,6 @@ BoundedContext acesso implements acesso {
 				String valor
 			}
 
-			ValueObject UsuarioNome {
-				String valor
-			}
-
 			// natural
 			ValueObject UsuarioEmail {
 				String valor
@@ -138,20 +131,13 @@ BoundedContext acesso implements acesso {
 				String valor
 			}
 
-			ValueObject UsuarioCurso {
-				String valor
-			}
-
-			ValueObject UsuarioCampus {
-				String valor
-			}
-
 			Service UsuarioServico {
-				@Usuario incluir(@Usuario agregado);
 				@Usuario buscar(@UsuarioIdentificador identificador);
 				void alterar(@Usuario agregado);
 				void excluir(@UsuarioIdentificador identificador);
 
+				// inclui e envia o e-mail de boas-vindas (autocadastro de aluno)
+				@Usuario criarConta(@Usuario agregado);
 				void inativar(@UsuarioIdentificador identificador);
 				void reativar(@UsuarioIdentificador identificador);
 			}

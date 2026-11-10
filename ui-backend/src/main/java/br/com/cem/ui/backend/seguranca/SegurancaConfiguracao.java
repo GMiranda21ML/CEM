@@ -27,7 +27,7 @@ public class SegurancaConfiguracao extends SegurancaConfiguracaoAbstrata {
 				.authorities(Autorizacao.ADMINISTRADOR.name()).build();
 
 		var usuario = User.withUsername("u").password(codificadorSenha.encode("u"))
-				.authorities(Autorizacao.USUARIO.name()).build();
+				.authorities(Autorizacao.ALUNO.name()).build();
 
 		return new InMemoryUserDetailsManager(administrador, usuario);
 	}
