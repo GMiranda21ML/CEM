@@ -1,0 +1,50 @@
+// Modelo de banco de dados do subdomínio acesso, a partir de docs/acesso/projeto.cml.
+// Prefixos usados neste arquivo: DEM (DominioEmail), USR (Usuario), CNV (Convite).
+
+Enum PAPEL {
+  ADMINISTRADOR
+  COORDENADOR
+  PROFESSOR
+  ALUNO
+}
+
+Enum SITUACAO_USUARIO {
+  ATIVO
+  INATIVO
+}
+
+Enum SITUACAO_CONVITE {
+  AGUARDANDO_ACEITE
+  ACEITO
+  CANCELADO
+}
+
+Table DEM_DOMINIO_EMAIL {
+  DEM_DOMINIO varchar(150) [pk, note: 'Domínio liberado para autocadastro de aluno, ex.: aluno.cem.edu.br']
+}
+
+Table USR_USUARIO {
+  USR_ID integer [pk, increment]
+  USR_NOME varchar(150) [not null]
+  USR_EMAIL varchar(180) [not null, unique]
+  USR_SENHA varchar(100) [not null, note: 'Hash da senha, nunca texto puro']
+  USR_PAPEL PAPEL [not null]
+  USR_CURSO varchar(150) [note: 'Nulo para o administrador CEM']
+  USR_CAMPUS varchar(150) [note: 'Nulo quando não definido']
+  USR_SITUACAO SITUACAO_USUARIO [not null]
+}
+
+Table CNV_CONVITE {
+  CNV_ID integer [pk, increment]
+  CNV_EMAIL varchar(180) [not null]
+  CNV_PAPEL PAPEL [not null, note: 'Só COORDENADOR ou PROFESSOR']
+  CNV_CURSO varchar(150) [not null]
+  CNV_CODIGO varchar(6) [not null]
+  CNV_ENVIADO_EM datetime [not null]
+  CNV_VALIDO_ATE datetime [not null]
+  CNV_SITUACAO SITUACAO_CONVITE [not null]
+
+  indexes {
+    (CNV_EMAIL, CNV_SITUACAO) [note: 'Busca do convite aguardando aceite por e-mail']
+  }
+}
