@@ -1,0 +1,12 @@
+import "../compartilhado/projeto.cml"
+
+ContextMap {
+	contains monitoria, compartilhado
+
+	monitoria Downstream-Upstream compartilhado
+}
+
+BoundedContext monitoria implements monitoria {
+	Module monitoria {
+	}
+}

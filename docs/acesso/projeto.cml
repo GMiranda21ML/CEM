@@ -1,0 +1,12 @@
+import "../compartilhado/projeto.cml"
+
+ContextMap {
+	contains acesso, compartilhado
+
+	acesso Downstream-Upstream compartilhado
+}
+
+BoundedContext acesso implements acesso {
+	Module acesso {
+	}
+}

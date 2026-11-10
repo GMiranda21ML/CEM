@@ -1,0 +1,12 @@
+import "../compartilhado/projeto.cml"
+
+ContextMap {
+	contains comunicacao, compartilhado
+
+	comunicacao Downstream-Upstream compartilhado
+}
+
+BoundedContext comunicacao implements comunicacao {
+	Module comunicacao {
+	}
+}

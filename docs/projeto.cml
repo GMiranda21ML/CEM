@@ -1,0 +1,4 @@
+import "compartilhado/projeto.cml"
+import "acesso/projeto.cml"
+import "comunicacao/projeto.cml"
+import "monitoria/projeto.cml"

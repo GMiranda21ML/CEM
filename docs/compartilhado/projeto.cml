@@ -1,0 +1,28 @@
+Domain dominio {
+	domainVisionStatement = "Sistema de gestão de monitoria e mentoria acadêmica"
+
+	Subdomain acesso {
+		type = SUPPORTING_DOMAIN
+		domainVisionStatement = "Cadastro e acesso de usuários, campus, cursos e disciplinas"
+	}
+
+	Subdomain comunicacao {
+		type = GENERIC_SUBDOMAIN
+		domainVisionStatement = "Notificações, FAQ, mural de avisos e certificados"
+	}
+
+	Subdomain monitoria {
+		type = CORE_DOMAIN
+		domainVisionStatement = "Seleção de monitores, agenda, sessões, faltas e avaliação de desempenho"
+	}
+}
+
+BoundedContext compartilhado {
+	Module compartilhado {
+		Aggregate compartilhado {
+			enum Autorizacao {
+				ADMINISTRADOR, USUARIO
+			}
+		}
+	}
+}
