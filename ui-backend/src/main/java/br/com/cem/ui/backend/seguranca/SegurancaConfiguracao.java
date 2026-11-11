@@ -11,7 +11,8 @@ import dev.sauloaraujo.d5.framework.ui.seguranca.SegurancaConfiguracaoAbstrata;
 public class SegurancaConfiguracao extends SegurancaConfiguracaoAbstrata {
 	// Autocadastro de aluno e aceite de convite acontecem sem login.
 	private static final String[] PUBLICAS = { "/" + Backend.PREFIXO + "acesso/usuario/criar-conta",
-			"/" + Backend.PREFIXO + "acesso/convite/verificacao", "/" + Backend.PREFIXO + "acesso/convite/aceitar" };
+			"/" + Backend.PREFIXO + "acesso/convite/verificacao", "/" + Backend.PREFIXO + "acesso/convite/aceitar",
+			"/" + Backend.PREFIXO + "comunicacao/certificado/validacao/**" };
 
 	@Override
 	protected void autorizar(
