@@ -1,12 +1,54 @@
 import "../compartilhado/projeto.cml"
+import "../acesso/projeto.cml"
 
 ContextMap {
-	contains monitoria, compartilhado
+	contains monitoria, acesso, compartilhado
 
 	monitoria Downstream-Upstream compartilhado
+	monitoria Downstream-Upstream acesso
 }
 
 BoundedContext monitoria implements monitoria {
 	Module monitoria {
+		Aggregate Avaliacao {
+			Entity Avaliacao {
+				aggregateRoot
+
+				-AvaliacaoIdentificador identificador key
+				-SessaoIdentificador sessao
+				-UsuarioIdentificador autor
+				AvaliacaoPerfil perfil
+				int nota
+				nullable String comentario
+				DateTime registradaEm
+				DateTime atualizadaEm
+
+				Repository AvaliacaoRepository {
+					@Avaliacao incluir(@Avaliacao agregado);
+					boolean existePorIdentificador(@AvaliacaoIdentificador identificador);
+					@Avaliacao buscarPorIdentificador(@AvaliacaoIdentificador identificador);
+					void alterar(@Avaliacao agregado);
+					boolean existePorSessaoEAutor(@SessaoIdentificador sessao, @UsuarioIdentificador autor);
+				}
+			}
+
+			enum AvaliacaoPerfil {
+				ALUNO, MONITOR_DE_SESSAO
+			}
+
+			ValueObject AvaliacaoIdentificador {
+				String valor
+			}
+
+			ValueObject SessaoIdentificador {
+				String valor
+			}
+
+			Service AvaliacaoServico {
+				@Avaliacao registrar(@SessaoIdentificador sessao, int nota, String comentario);
+				@Avaliacao buscar(@AvaliacaoIdentificador identificador);
+				void editar(@AvaliacaoIdentificador identificador, int nota, String comentario);
+			}
+		}
 	}
 }

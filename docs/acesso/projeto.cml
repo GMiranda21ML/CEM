@@ -142,5 +142,53 @@ BoundedContext acesso implements acesso {
 				void reativar(@UsuarioIdentificador identificador);
 			}
 		}
+
+		Aggregate Campus {
+			Entity Campus {
+				aggregateRoot
+
+				-CampusIdentificador identificador key
+				-InstituicaoIdentificador instituicao
+				String nome
+				nullable String endereco
+				CampusSituacao situacao
+
+				Repository CampusRepository {
+					@Campus incluir(@Campus agregado);
+					boolean existePorIdentificador(@CampusIdentificador identificador);
+					@Campus buscarPorIdentificador(@CampusIdentificador identificador);
+					void alterar(@Campus agregado);
+					boolean existePorNome(String nome, @InstituicaoIdentificador instituicao);
+					boolean existeOutroPorNome(String nome, @InstituicaoIdentificador instituicao, @CampusIdentificador identificador);
+				}
+			}
+
+			enum CampusSituacao {
+				ATIVO, INATIVO
+			}
+
+			ValueObject CampusIdentificador {
+				String valor
+			}
+
+			ValueObject InstituicaoIdentificador {
+				String valor
+			}
+
+			Service CampusServico {
+				@Campus cadastrar(String nome, String endereco);
+				@Campus buscar(@CampusIdentificador identificador);
+				void alterar(@Campus agregado);
+				void inativar(@CampusIdentificador identificador);
+				void reativar(@CampusIdentificador identificador);
+				boolean estaAtivo(@CampusIdentificador identificador);
+			}
+		}
+
+		Aggregate ReferenciasAcademicas {
+			ValueObject DisciplinaIdentificador {
+				String valor
+			}
+		}
 	}
 }

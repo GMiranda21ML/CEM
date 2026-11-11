@@ -1,12 +1,64 @@
 import "../compartilhado/projeto.cml"
+import "../acesso/projeto.cml"
 
 ContextMap {
-	contains comunicacao, compartilhado
+	contains comunicacao, acesso, compartilhado
 
 	comunicacao Downstream-Upstream compartilhado
+	comunicacao Downstream-Upstream acesso
 }
 
 BoundedContext comunicacao implements comunicacao {
 	Module comunicacao {
+		Aggregate Certificado {
+			Entity Certificado {
+				aggregateRoot
+
+				-CertificadoIdentificador identificador key
+				-CodigoVerificacao codigo
+				-UsuarioIdentificador beneficiario
+				String beneficiarioNome
+				CertificadoTipo tipo
+				-DisciplinaIdentificador disciplina
+				String disciplinaNome
+				Periodo periodo
+				int quantidadeSessoes
+				long cargaHorariaMinutos
+				String coordenador
+				DateTime emitidoEm
+
+				Repository CertificadoRepository {
+					@Certificado incluir(@Certificado agregado);
+					boolean existePorIdentificador(@CertificadoIdentificador identificador);
+					@Certificado buscarPorIdentificador(@CertificadoIdentificador identificador);
+					boolean existePorCodigo(@CodigoVerificacao codigo);
+					@Certificado buscarPorCodigo(@CodigoVerificacao codigo);
+					boolean existePorIdentidade(@UsuarioIdentificador beneficiario, CertificadoTipo tipo, @DisciplinaIdentificador disciplina, Periodo periodo);
+				}
+			}
+
+			enum CertificadoTipo {
+				ALUNO, MONITOR_DE_SESSAO
+			}
+
+			ValueObject CertificadoIdentificador {
+				String valor
+			}
+
+			ValueObject CodigoVerificacao {
+				String valor
+			}
+
+			ValueObject Periodo {
+				Date inicio
+				Date fim
+			}
+
+			Service CertificadoServico {
+				@Certificado emitir(@UsuarioIdentificador beneficiario, CertificadoTipo tipo, @DisciplinaIdentificador disciplina, Periodo periodo);
+				@Certificado buscar(@CertificadoIdentificador identificador);
+				@Certificado validar(@CodigoVerificacao codigo);
+			}
+		}
 	}
 }
