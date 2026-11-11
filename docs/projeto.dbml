@@ -1,1 +1,4 @@
 // Complementa os modelos docs/S/projeto.dbml de cada subdomínio S.
+
+Ref: AVL_AVALIACAO.USR_ID > USR_USUARIO.USR_ID
+Ref: CER_CERTIFICADO.USR_ID > USR_USUARIO.USR_ID

@@ -1,0 +1,28 @@
+// Modelo de banco de dados do subdomínio comunicação, a partir de docs/comunicacao/projeto.cml.
+// Prefixo usado neste arquivo: CER (Certificado).
+
+Enum TIPO_CERTIFICADO {
+  ALUNO
+  MONITOR
+}
+
+Table CER_CERTIFICADO {
+  CER_ID integer [pk, increment]
+  CER_CODIGO varchar(24) [not null, unique]
+  USR_ID integer [not null]
+  CER_BENEFICIARIO_NOME varchar(150) [not null]
+  CER_TIPO TIPO_CERTIFICADO [not null]
+  CER_DISCIPLINA_ID varchar(100) [not null, note: 'Identificador fornecido pelo agregado de disciplina']
+  CER_DISCIPLINA_NOME varchar(150) [not null]
+  CER_PERIODO_INICIO date [not null]
+  CER_PERIODO_FIM date [not null]
+  CER_QUANTIDADE_SESSOES integer [not null]
+  CER_CARGA_HORARIA_MINUTOS bigint [not null]
+  CER_COORDENADOR varchar(180) [not null]
+  CER_EMITIDO_EM datetime [not null]
+
+  indexes {
+    (USR_ID, CER_TIPO, CER_DISCIPLINA_ID, CER_PERIODO_INICIO, CER_PERIODO_FIM) [unique, note: 'Identidade do certificado']
+    (USR_ID, CER_EMITIDO_EM) [note: 'Consulta dos certificados do beneficiário']
+  }
+}

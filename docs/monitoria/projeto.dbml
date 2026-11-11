@@ -1,0 +1,23 @@
+// Modelo de banco de dados do subdomínio monitoria, a partir de docs/monitoria/projeto.cml.
+// Prefixo usado neste arquivo: AVL (Avaliacao).
+
+Enum PERFIL_AVALIACAO {
+  ALUNO
+  MONITOR
+}
+
+Table AVL_AVALIACAO {
+  AVL_ID integer [pk, increment]
+  AVL_SESSAO_ID varchar(100) [not null, note: 'Identificador fornecido pelo agregado de sessão']
+  USR_ID integer [not null]
+  AVL_PERFIL PERFIL_AVALIACAO [not null]
+  AVL_NOTA tinyint [not null, note: 'Valor inteiro entre 1 e 5']
+  AVL_COMENTARIO varchar(1000)
+  AVL_REGISTRADA_EM datetime [not null]
+  AVL_ATUALIZADA_EM datetime [not null]
+
+  indexes {
+    (AVL_SESSAO_ID, USR_ID) [unique, note: 'Uma avaliação por participante e sessão']
+    (AVL_SESSAO_ID, AVL_NOTA) [note: 'Consulta das avaliações e cálculo da média da sessão']
+  }
+}

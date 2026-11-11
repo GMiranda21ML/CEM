@@ -1,5 +1,5 @@
 // Modelo de banco de dados do subdomínio acesso, a partir de docs/acesso/projeto.cml.
-// Prefixos usados neste arquivo: DEM (DominioEmail), USR (Usuario), CNV (Convite).
+// Prefixos usados neste arquivo: DEM (DominioEmail), USR (Usuario), CNV (Convite), CAM (Campus).
 
 Enum PAPEL {
   ADMINISTRADOR
@@ -17,6 +17,11 @@ Enum SITUACAO_CONVITE {
   AGUARDANDO_ACEITE
   ACEITO
   CANCELADO
+}
+
+Enum SITUACAO_CAMPUS {
+  ATIVO
+  INATIVO
 }
 
 Table DEM_DOMINIO_EMAIL {
@@ -46,5 +51,18 @@ Table CNV_CONVITE {
 
   indexes {
     (CNV_EMAIL, CNV_SITUACAO) [note: 'Busca do convite aguardando aceite por e-mail']
+  }
+}
+
+Table CAM_CAMPUS {
+  CAM_ID integer [pk, increment]
+  CAM_INSTITUICAO varchar(180) [not null]
+  CAM_NOME varchar(150) [not null]
+  CAM_ENDERECO varchar(250)
+  CAM_SITUACAO SITUACAO_CAMPUS [not null]
+
+  indexes {
+    (CAM_INSTITUICAO, CAM_NOME) [unique, note: 'Nome único dentro da instituição']
+    (CAM_INSTITUICAO, CAM_SITUACAO) [note: 'Listagem de campi da instituição por situação']
   }
 }
