@@ -35,6 +35,7 @@ public class AutenticacaoControlador extends AutenticacaoControladorAbstrato {
 		var dominioEmail = dominioEmailServico.criarAutorizacoes(Optional.empty());
 		var usuarios = usuarioServico.criarAutorizacoes(Optional.empty());
 		var convite = conviteServico.criarAutorizacoes(Optional.empty());
-		return new AutenticacaoRecurso(segurancaServico.getUsuario(), dominioEmail, usuarios, convite);
+		return new AutenticacaoRecurso(segurancaServico.getUsuario(), segurancaServico.getAutorizacoes(), dominioEmail,
+				usuarios, convite);
 	}
 }

@@ -24,7 +24,7 @@ public interface IUsuarioRepositorioJpa extends JpaRepository<UsuarioJpa, Long> 
 	Optional<UsuarioJpa> findByEmailIgnoreCase(String email);
 
 	@Query("""
-			select new br.com.cem.aplicacao.acesso.usuario.UsuarioProjecao(u.identificador, u.nome, u.email, u.papel, u.curso, u.situacao)
+			select new br.com.cem.aplicacao.acesso.usuario.UsuarioProjecao(u.identificador, u.nome, u.email, u.papel, u.curso, u.campus, u.situacao)
 			  from UsuarioJpa u
 			 where (:nome is null or lower(u.nome) like :nome escape '\\')
 			   and (:papel is null or u.papel = :papel)

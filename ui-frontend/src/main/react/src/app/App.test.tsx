@@ -26,10 +26,10 @@ describe('App', () => {
 
     const roteador = renderizar('/inicio');
 
-    expect(await screen.findByRole('heading', { name: 'Entrar' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Entrar no CEM' })).toBeInTheDocument();
     expect(roteador.state.location.pathname).toBe('/login');
     expect(roteador.state.location.search).toBe('?retorno=%2Finicio');
-    expect(document.querySelector('.navbar-brand')).toHaveTextContent('Cem');
+    expect(document.querySelector('.brand strong')).toHaveTextContent('CEM');
   });
 
   it('mostra o início para o usuário autenticado', async () => {

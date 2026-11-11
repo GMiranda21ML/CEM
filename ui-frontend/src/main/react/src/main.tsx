@@ -3,6 +3,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router/dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './app/estilos.css';
 import { roteador } from './app/rotas';
 import { clienteConsultas } from './d5';
 

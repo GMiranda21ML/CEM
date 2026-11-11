@@ -86,6 +86,10 @@ public final class Usuario implements IAgregado<UsuarioIdentificador> {
 		return situacao == UsuarioSituacao.ATIVO;
 	}
 
+	public Usuario alterarDados(String nome, @Nullable String curso, @Nullable String campus) {
+		return new Usuario(identificador, nome, emailInstitucional, senha, papel, curso, campus, situacao);
+	}
+
 	public Usuario inativar() {
 		Validate.validState(estaAtivo(), "O usuário já está inativo");
 		return new Usuario(identificador, nome, emailInstitucional, senha, papel, curso, campus,

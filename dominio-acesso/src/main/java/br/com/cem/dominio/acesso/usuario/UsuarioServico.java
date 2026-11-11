@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 
 import br.com.cem.dominio.Autorizacao;
 import br.com.cem.dominio.acesso.dominioemail.DominioEmailDominio;
@@ -49,7 +50,26 @@ public final class UsuarioServico extends AgregadoServicoAbstrato<UsuarioIdentif
 		// a autorização de incluir é sempre verdadeira, e a consulta ao usuário autenticado é
 		// protegida, pois quem chama essa ação pode estar anônimo.
 		var coordenador = possuiPapel(Autorizacao.COORDENADOR);
-		return new UsuarioAutorizacoes(true, coordenador, coordenador, coordenador, coordenador, coordenador);
+		var administrador = possuiPapel(Autorizacao.ADMINISTRADOR);
+
+		// O administrador também pesquisa usuários: é como ele lista os coordenadores já
+		// cadastrados na tela "Coordenadores".
+		var buscar = coordenador || administrador;
+
+		// O coordenador só mantém professores e alunos (RN004 — quem convida quem): a conta do
+		// administrador e as de outros coordenadores ficam fora do alcance dele, mesmo que a
+		// pesquisa as devolva.
+		var gerenciar = coordenador && alvoEhGerenciavelPorCoordenador(identificador);
+
+		return new UsuarioAutorizacoes(true, buscar, gerenciar, gerenciar, gerenciar, gerenciar);
+	}
+
+	private boolean alvoEhGerenciavelPorCoordenador(Optional<UsuarioIdentificador> identificador) {
+		if (identificador.isEmpty() || !repositorio.existePorIdentificador(identificador.get())) {
+			return true;
+		}
+		var papelAlvo = repositorio.buscarPorIdentificador(identificador.get()).getPapel();
+		return papelAlvo != Autorizacao.ADMINISTRADOR && papelAlvo != Autorizacao.COORDENADOR;
 	}
 
 	private boolean possuiPapel(Autorizacao papel) {
@@ -105,6 +125,19 @@ public final class UsuarioServico extends AgregadoServicoAbstrato<UsuarioIdentif
 		enviadorEmailServico.enviar(usuario.getEmailInstitucional().toString(), ASSUNTO_BOAS_VINDAS, corpo);
 
 		return usuario;
+	}
+
+	/** Altera nome, curso e campus, sem tocar em e-mail, perfil ou senha. */
+	public void atualizarDados(UsuarioIdentificador identificador, String nome, @Nullable String curso,
+			@Nullable String campus) {
+		Objects.requireNonNull(identificador);
+		Objects.requireNonNull(nome);
+
+		validarAutorizacao(Optional.of(identificador), UsuarioAutorizacoes::getAlterar);
+		validarExistencia(identificador);
+
+		var usuario = repositorio.buscarPorIdentificador(identificador);
+		repositorio.alterar(usuario.alterarDados(nome, curso, campus));
 	}
 
 	public void inativar(UsuarioIdentificador identificador) {

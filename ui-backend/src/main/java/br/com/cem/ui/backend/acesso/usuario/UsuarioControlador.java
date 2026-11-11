@@ -39,6 +39,15 @@ public class UsuarioControlador
 		servico.criarConta(agregado);
 	}
 
+	@PostMapping("{identificador}/atualizar-dados")
+	public void atualizarDados(@PathVariable UsuarioIdentificador identificador,
+			@RequestBody AtualizarDadosRequisicao requisicao) {
+		Objects.requireNonNull(identificador);
+		Objects.requireNonNull(requisicao);
+
+		servico.atualizarDados(identificador, requisicao.nome(), requisicao.curso(), requisicao.campus());
+	}
+
 	@PostMapping("{identificador}/inativar")
 	public void inativar(@PathVariable UsuarioIdentificador identificador) {
 		Objects.requireNonNull(identificador);
