@@ -40,14 +40,132 @@ BoundedContext monitoria implements monitoria {
 				String valor
 			}
 
-			ValueObject SessaoIdentificador {
-				String valor
-			}
-
 			Service AvaliacaoServico {
 				@Avaliacao registrar(@SessaoIdentificador sessao, int nota, String comentario);
 				@Avaliacao buscar(@AvaliacaoIdentificador identificador);
 				void editar(@AvaliacaoIdentificador identificador, int nota, String comentario);
+			}
+		}
+		// Funcionalidades F009, F010 e F011
+		Aggregate Sessao {
+			ValueObject SessaoIdentificador { String valor }
+			Entity Sessao {
+				aggregateRoot
+				-SessaoIdentificador identificador key
+				String disciplina
+				-UsuarioIdentificador professor
+				-UsuarioIdentificador monitor
+				-CampusIdentificador campus
+				Collection<UsuarioIdentificador> alunos
+				DateTime inicio
+				DateTime fim
+				boolean cancelada
+				Repository SessaoRepository {
+					boolean existePorMonitor(@UsuarioIdentificador monitor);
+					@Sessao incluir(@Sessao agregado);
+					boolean existePorIdentificador(@SessaoIdentificador identificador);
+					@Sessao buscarPorIdentificador(@SessaoIdentificador identificador);
+					void alterar(@Sessao agregado);
+					void excluir(@SessaoIdentificador identificador);
+					boolean conflita(@UsuarioIdentificador monitor, @UsuarioIdentificador aluno, DateTime inicio, DateTime fim);
+					void bloquearAgenda(@UsuarioIdentificador monitor);
+				}
+			}
+			Service SessaoServico {
+				@Sessao buscar(@SessaoIdentificador identificador);
+				void cancelar(@SessaoIdentificador identificador);
+				@Sessao incluir(@Sessao agregado);
+			}
+		}
+		Aggregate Disponibilidade {
+			Entity Disponibilidade {
+				aggregateRoot
+				-DisponibilidadeIdentificador identificador key
+				String disciplina
+				-UsuarioIdentificador monitor
+				-CampusIdentificador campus
+				int diaSemana
+				String inicio
+				String fim
+				Repository DisponibilidadeRepository {
+					@Disponibilidade incluir(@Disponibilidade agregado);
+					boolean existePorIdentificador(@DisponibilidadeIdentificador identificador);
+					@Disponibilidade buscarPorIdentificador(@DisponibilidadeIdentificador identificador);
+					void alterar(@Disponibilidade agregado);
+					void excluir(@DisponibilidadeIdentificador identificador);
+					Collection<@Disponibilidade> buscarDoMonitor(@UsuarioIdentificador monitor, String disciplina);
+				}
+			}
+			ValueObject DisponibilidadeIdentificador { String valor }
+			Service DisponibilidadeServico {
+				@Disponibilidade buscar(@DisponibilidadeIdentificador identificador);
+				@Disponibilidade incluir(@Disponibilidade agregado);
+				void alterar(@Disponibilidade agregado);
+				void excluir(@DisponibilidadeIdentificador identificador);
+			}
+		}
+		Aggregate Falta {
+			Entity Falta {
+				aggregateRoot
+				-FaltaIdentificador identificador key
+				-SessaoIdentificador sessao
+				-UsuarioIdentificador pessoa
+				String papel
+				-UsuarioIdentificador autor
+				nullable String observacao
+				DateTime registradaEm
+				nullable -SessaoIdentificador reposicao
+				Repository FaltaRepository {
+					@Falta incluir(@Falta agregado);
+					boolean existePorIdentificador(@FaltaIdentificador identificador);
+					@Falta buscarPorIdentificador(@FaltaIdentificador identificador);
+					void alterar(@Falta agregado);
+					void excluir(@FaltaIdentificador identificador);
+					boolean existePorSessaoEPessoa(@SessaoIdentificador sessao, @UsuarioIdentificador pessoa);
+					long contar(@UsuarioIdentificador pessoa, String papel, String disciplina);
+				}
+			}
+			ValueObject FaltaIdentificador { String valor }
+			ValueObject SugestaoReposicao {
+				DateTime inicio
+				DateTime fim
+				-CampusIdentificador campus
+			}
+			Service FaltaServico {
+				@Falta buscar(@FaltaIdentificador identificador);
+				@Falta registrar(@SessaoIdentificador sessao, @UsuarioIdentificador pessoa, String papel, String observacao);
+				void editar(@FaltaIdentificador identificador, String observacao);
+				List<SugestaoReposicao> sugerir(@FaltaIdentificador identificador);
+				@Sessao agendar(@FaltaIdentificador identificador, SugestaoReposicao escolha);
+				void excluir(@FaltaIdentificador identificador);
+			}
+		}
+		Aggregate Alerta {
+			Service CoordenadoresAlertaServico {
+				Collection<@Usuario> buscarPorPessoa(@UsuarioIdentificador pessoa);
+			}
+			Entity Alerta {
+				aggregateRoot
+				-AlertaIdentificador identificador key
+				-UsuarioIdentificador pessoa
+				String papel
+				String disciplina
+				boolean acompanhado
+				DateTime criadoEm
+				Repository AlertaRepository {
+					@Alerta incluir(@Alerta agregado);
+					boolean existePorIdentificador(@AlertaIdentificador identificador);
+					@Alerta buscarPorIdentificador(@AlertaIdentificador identificador);
+					void alterar(@Alerta agregado);
+					void excluir(@AlertaIdentificador identificador);
+					boolean existeNovo(@UsuarioIdentificador pessoa, String papel, String disciplina);
+				}
+			}
+			ValueObject AlertaIdentificador { String valor }
+			Service AlertaServico {
+				@Alerta buscar(@AlertaIdentificador identificador);
+				void acompanhar(@AlertaIdentificador identificador);
+				long contar(@AlertaIdentificador identificador);
 			}
 		}
 	}

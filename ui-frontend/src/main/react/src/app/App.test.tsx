@@ -22,7 +22,10 @@ describe('App', () => {
   });
 
   it('envia o usuário anônimo para o login', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => new Response(null, { status: 401 })));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(null, { status: 401 })),
+    );
 
     const roteador = renderizar('/inicio');
 
@@ -35,12 +38,19 @@ describe('App', () => {
   it('mostra o início para o usuário autenticado', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () => Response.json({ usuario: 'maria' })),
+      vi.fn(async (url: string) =>
+        Response.json(
+          url.includes('/aviso/')
+            ? { resultado: { projecoes: [], total: 0 } }
+            : { usuario: 'maria' },
+        ),
+      ),
     );
 
     renderizar('/');
 
     expect(await screen.findByText('maria')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Sair' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Mural de avisos' })).toBeInTheDocument();
   });
 });

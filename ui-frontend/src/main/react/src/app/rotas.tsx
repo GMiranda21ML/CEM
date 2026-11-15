@@ -20,7 +20,9 @@ export const rotas = [
       },
       {
         path: 'convite',
-        lazy: async () => ({ Component: (await import('./convite/TenhoUmConvite')).TenhoUmConvite }),
+        lazy: async () => ({
+          Component: (await import('./convite/TenhoUmConvite')).TenhoUmConvite,
+        }),
       },
       {
         // Adicione aqui as rotas de cada agregado, dentro desta rota protegida.
@@ -29,10 +31,48 @@ export const rotas = [
         ErrorBoundary: ErroRota,
         loader: exigirAutenticacao,
         children: [
+          {
+            path: 'comunicacao/faq/pesquisa',
+            lazy: async () => {
+              const modulo = await import('./comunicacao/faq/Faq');
+              return { Component: modulo.Faq, loader: modulo.loader };
+            },
+          },
+          {
+            path: 'comunicacao/aviso/pesquisa',
+            lazy: async () => {
+              const modulo = await import('./comunicacao/aviso/MuralDeAvisos');
+              return { Component: modulo.MuralDeAvisos, loader: modulo.loader };
+            },
+          },
+          {
+            path: 'monitoria/falta/pesquisa',
+            lazy: async () => {
+              const modulo = await import('./monitoria/falta/FaltasEReposicao');
+              return { Component: modulo.FaltasEReposicao, loader: modulo.loader };
+            },
+          },
+          {
+            path: 'monitoria/alerta/pesquisa',
+            lazy: async () => {
+              const modulo = await import('./monitoria/alerta/AlertasDeFaltas');
+              return { Component: modulo.AlertasDeFaltas, loader: modulo.loader };
+            },
+          },
+          {
+            path: 'monitoria/sessao/pesquisa',
+            lazy: async () => {
+              const modulo = await import('./monitoria/sessao/AgendaDeReposicao');
+              return { Component: modulo.AgendaDeReposicao, loader: modulo.loader };
+            },
+          },
           { index: true, element: <Navigate to="/inicio" replace /> },
           {
             path: 'inicio',
-            lazy: async () => ({ Component: (await import('./inicio/Inicio')).Inicio }),
+            lazy: async () => {
+              const modulo = await import('./inicio/Inicio');
+              return { Component: modulo.Inicio, loader: modulo.loader };
+            },
           },
           {
             path: 'acesso/coordenadores',

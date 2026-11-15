@@ -60,5 +60,86 @@ BoundedContext comunicacao implements comunicacao {
 				@Certificado validar(@CodigoVerificacao codigo);
 			}
 		}
+		// Funcionalidades F009, F010 e F011
+		Aggregate Faq {
+			Entity Faq {
+				aggregateRoot
+				-FaqIdentificador identificador key
+				String pergunta
+				String resposta
+				boolean ativo
+				Repository FaqRepository {
+					@Faq incluir(@Faq agregado);
+					boolean existePorIdentificador(@FaqIdentificador identificador);
+					@Faq buscarPorIdentificador(@FaqIdentificador identificador);
+					void alterar(@Faq agregado);
+					void excluir(@FaqIdentificador identificador);
+					boolean existePorPergunta(String pergunta, @FaqIdentificador ignorado);
+				}
+			}
+			ValueObject FaqIdentificador { String valor }
+			Service FaqServico {
+				@Faq buscar(@FaqIdentificador identificador);
+				@Faq incluir(@Faq agregado);
+				void alterar(@Faq agregado);
+				void excluir(@FaqIdentificador identificador);
+			}
+		}
+		Aggregate Pergunta {
+			Entity Pergunta {
+				aggregateRoot
+				-PerguntaIdentificador identificador key
+				-UsuarioIdentificador autor
+				String texto
+				String situacao
+				nullable String resposta
+				DateTime criadaEm
+				Repository PerguntaRepository {
+					void bloquear(@PerguntaIdentificador identificador);
+					@Pergunta incluir(@Pergunta agregado);
+					boolean existePorIdentificador(@PerguntaIdentificador identificador);
+					@Pergunta buscarPorIdentificador(@PerguntaIdentificador identificador);
+					void alterar(@Pergunta agregado);
+					void excluir(@PerguntaIdentificador identificador);
+				}
+			}
+			ValueObject PerguntaIdentificador { String valor }
+			Service PerguntaServico {
+				@Pergunta buscar(@PerguntaIdentificador identificador);
+				@Pergunta enviar(String texto);
+				void editar(@PerguntaIdentificador identificador, String texto);
+				void responder(@PerguntaIdentificador identificador, String pergunta, String resposta, boolean ativo);
+				void descartar(@PerguntaIdentificador identificador);
+				void excluir(@PerguntaIdentificador identificador);
+			}
+		}
+		Aggregate Aviso {
+			Entity Aviso {
+				aggregateRoot
+				-AvisoIdentificador identificador key
+				String titulo
+				String texto
+				Date validade
+				boolean ativo
+				DateTime publicadoEm
+				Repository AvisoRepository {
+					@Aviso incluir(@Aviso agregado);
+					boolean existePorIdentificador(@AvisoIdentificador identificador);
+					@Aviso buscarPorIdentificador(@AvisoIdentificador identificador);
+					void alterar(@Aviso agregado);
+					void excluir(@AvisoIdentificador identificador);
+				}
+			}
+			ValueObject AvisoIdentificador { String valor }
+			Service MonitorAvisoServico {
+				boolean eMonitor(@UsuarioIdentificador usuario);
+			}
+			Service AvisoServico {
+				@Aviso buscar(@AvisoIdentificador identificador);
+				@Aviso publicar(String titulo, String texto, Date validade);
+				void alternar(@AvisoIdentificador identificador);
+				void alterar(@Aviso agregado);
+			}
+		}
 	}
 }

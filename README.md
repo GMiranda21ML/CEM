@@ -73,19 +73,66 @@ cp ui-backend/src/main/resources/application-local.properties.example \
 
 **Windows (PowerShell):**
 
-```
-copy ui-backend\src\main\resources\application-local.properties.example `
-     ui-backend\src\main\resources\application-local.properties
+Execute na pasta raiz do projeto. Se o arquivo local já existir, preserve sua configuração:
+
+```powershell
+if (-not (Test-Path "ui-backend\src\main\resources\application-local.properties")) { Copy-Item "ui-backend\src\main\resources\application-local.properties.example" "ui-backend\src\main\resources\application-local.properties" }
 ```
 
 Edite `application-local.properties` com o e-mail e a senha de app gerados. Esse arquivo é
 ignorado pelo git (nunca commitar credenciais).
 
+O caminho completo dentro do projeto é:
+
+```text
+ui-backend/src/main/resources/application-local.properties
+```
+
+No IntelliJ, procure o arquivo na árvore de pastas do projeto. Ele não aparece como uma
+alteração a ser enviada ao Git. Para abri-lo pelo PowerShell, a partir da raiz do projeto:
+
+```powershell
+notepad .\ui-backend\src\main\resources\application-local.properties
+```
+
 ## 3. Rodar o backend
+
+Abra o terminal na raiz do projeto, onde está o `pom.xml` principal. O MySQL/MariaDB deve
+estar em execução. Confira Java e Maven:
+
+```powershell
+java -version
+mvn -version
+```
+
+O Maven deve informar Java 25 ou mais novo. Se `mvn` não for reconhecido ou o Java estiver
+em outra versão, configure os caminhos nesse terminal antes de executar o backend.
+Exemplo para o Java 25.0.2 e o Maven incluído no IntelliJ IDEA 2026.3:
+
+```powershell
+$env:JAVA_HOME = "$env:USERPROFILE\.jdks\openjdk-25.0.2"
+$env:Path = "$env:JAVA_HOME\bin;C:\Program Files\JetBrains\IntelliJ IDEA 2026.3\plugins\maven-plugin\lib\maven3\bin;$env:Path"
+mvn -version
+```
+
+Ajuste os caminhos se sua instalação for diferente. Essas variáveis valem para o terminal
+atual; ao abrir outro terminal, repita a configuração ou use variáveis de ambiente permanentes.
+
+Na primeira execução, ou após alterar outros módulos, prepare os artefatos locais:
+
+```
+mvn install -DskipTests
+```
+
+Depois, mantenha o terminal aberto e execute:
 
 ```
 mvn spring-boot:test-run -pl ui-backend
 ```
+
+Uma inicialização bem-sucedida mostra `Started BackendAplicacao` e a porta `8080`.
+Se a porta já estiver ocupada por outra instância do CEM, use essa instância ou encerre-a
+com `Ctrl + C` no respectivo terminal antes de iniciar outra.
 
 Sobe em `http://localhost:8080`. Na primeira execução, uma conta de administrador é criada
 automaticamente:

@@ -26,3 +26,30 @@ Table CER_CERTIFICADO {
     (USR_ID, CER_EMITIDO_EM) [note: 'Consulta dos certificados do beneficiário']
   }
 }
+
+// Funcionalidades F009, F010 e F011
+Table FAQ_FAQ {
+  FAQ_ID bigint [pk, increment]
+  FAQ_PERGUNTA varchar(200) [not null]
+  FAQ_CHAVE varchar(200) [not null, unique, note: 'Pergunta sem espaços nas extremidades e em minúsculas']
+  FAQ_RESPOSTA varchar(1000) [not null]
+  FAQ_ATIVO boolean [not null]
+}
+
+Table PRG_PERGUNTA {
+  PRG_ID bigint [pk, increment]
+  PRG_AUTOR_ID bigint [not null]
+  PRG_TEXTO varchar(300) [not null]
+  PRG_SITUACAO varchar(20) [not null]
+  PRG_RESPOSTA varchar(1000)
+  PRG_CRIADA_EM datetime [not null]
+}
+
+Table AVS_AVISO {
+  AVS_ID bigint [pk, increment]
+  AVS_TITULO varchar(100) [not null]
+  AVS_TEXTO varchar(1000) [not null]
+  AVS_VALIDADE date [not null]
+  AVS_ATIVO boolean [not null]
+  AVS_PUBLICADO_EM datetime [not null]
+}

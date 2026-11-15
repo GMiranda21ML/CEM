@@ -18,7 +18,7 @@ function iniciais(email: string): string {
 }
 
 export function App() {
-  const { autenticado, usuario, autorizacoes } = useAutenticacao();
+  const { autenticado, usuario, autorizacoes, autorizacoesDe } = useAutenticacao();
   const navegar = useNavigate();
 
   async function aoSair() {
@@ -69,6 +69,26 @@ export function App() {
                 <>
                   <div className="nav-group">Geral</div>
                   <ItemMenu caminho="/inicio">Início</ItemMenu>
+                  {autorizacoesDe('faq')?.buscar && (
+                    <ItemMenu caminho="/comunicacao/faq/pesquisa">
+                      {autorizacoesDe('faq')?.incluir ? 'FAQ' : 'Ajuda (FAQ)'}
+                    </ItemMenu>
+                  )}
+                  {autorizacoesDe('aviso')?.buscar && (
+                    <ItemMenu caminho="/comunicacao/aviso/pesquisa">Mural de avisos</ItemMenu>
+                  )}
+                  {autorizacoesDe('sessao')?.buscar && (
+                    <ItemMenu caminho="/monitoria/sessao/pesquisa">
+                      {autorizacoesDe('sessao')?.incluir ? 'Agenda de reposição' : 'Minhas sessões'}
+                    </ItemMenu>
+                  )}
+                  {autorizacoesDe('falta')?.buscar &&
+                    (autorizacoes.includes('ALUNO') || autorizacoes.includes('PROFESSOR')) && (
+                      <ItemMenu caminho="/monitoria/falta/pesquisa">Faltas e reposição</ItemMenu>
+                    )}
+                  {autorizacoesDe('alerta')?.buscar && (
+                    <ItemMenu caminho="/monitoria/alerta/pesquisa">Alertas de faltas</ItemMenu>
+                  )}
                 </>
               )}
             </nav>
@@ -90,7 +110,11 @@ export function App() {
                         <strong>{usuario}</strong>
                       </span>
                     </div>
-                    <button className="button button-ghost button-small" type="button" onClick={aoSair}>
+                    <button
+                      className="button button-ghost button-small"
+                      type="button"
+                      onClick={aoSair}
+                    >
                       Sair
                     </button>
                   </>

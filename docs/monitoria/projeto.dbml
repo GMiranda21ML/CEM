@@ -21,3 +21,65 @@ Table AVL_AVALIACAO {
     (AVL_SESSAO_ID, AVL_NOTA) [note: 'Consulta das avaliações e cálculo da média da sessão']
   }
 }
+
+// Funcionalidades F009, F010 e F011
+Table SES_SESSAO {
+  SES_ID bigint [pk, increment]
+  SES_DISCIPLINA varchar(150) [not null]
+  SES_PROFESSOR_ID bigint [not null]
+  SES_MONITOR_ID bigint [not null]
+  CAM_ID bigint [not null]
+  SES_INICIO datetime [not null]
+  SES_FIM datetime [not null]
+  SES_CANCELADA boolean [not null]
+  indexes {
+    (SES_MONITOR_ID, SES_INICIO, SES_FIM)
+  }
+}
+
+Table SAP_SESSAO_ALUNO {
+  SES_ID bigint [not null]
+  USR_ID bigint [not null]
+  indexes {
+    (SES_ID, USR_ID) [unique]
+    USR_ID
+  }
+}
+
+Table DSP_DISPONIBILIDADE {
+  DSP_ID bigint [pk, increment]
+  DSP_DISCIPLINA varchar(150) [not null]
+  DSP_MONITOR_ID bigint [not null]
+  CAM_ID bigint [not null]
+  DSP_DIA_SEMANA int [not null]
+  DSP_INICIO time [not null]
+  DSP_FIM time [not null]
+}
+
+Table FLT_FALTA {
+  FLT_ID bigint [pk, increment]
+  SES_ID bigint [not null]
+  FLT_PESSOA_ID bigint [not null]
+  FLT_PAPEL varchar(10) [not null]
+  FLT_AUTOR_ID bigint [not null]
+  FLT_OBSERVACAO varchar(1000)
+  FLT_REGISTRADA_EM datetime [not null]
+  SES_REPOSICAO_ID bigint [note: 'Sessão de reposição; vínculo unidirecional a partir da falta']
+  indexes {
+    (SES_ID, FLT_PESSOA_ID) [unique]
+    (FLT_PESSOA_ID, FLT_PAPEL)
+  }
+}
+
+Table ALF_ALERTA {
+  ALF_ID bigint [pk, increment]
+  ALF_PESSOA_ID bigint [not null]
+  ALF_PAPEL varchar(10) [not null]
+  ALF_DISCIPLINA varchar(150) [not null]
+  ALF_ACOMPANHADO boolean [not null]
+  ALF_CRIADO_EM datetime [not null]
+}
+
+Ref: SAP_SESSAO_ALUNO.SES_ID > SES_SESSAO.SES_ID
+Ref: FLT_FALTA.SES_ID > SES_SESSAO.SES_ID
+Ref: FLT_FALTA.SES_REPOSICAO_ID > SES_SESSAO.SES_ID
