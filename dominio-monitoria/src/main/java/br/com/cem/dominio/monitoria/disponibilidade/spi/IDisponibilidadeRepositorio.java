@@ -11,4 +11,6 @@ import java.util.Collection;
 public interface IDisponibilidadeRepositorio
 		extends IAgregadoRepositorio<DisponibilidadeIdentificador, Disponibilidade> {
 	Collection<Disponibilidade> buscarDoMonitor(UsuarioIdentificador monitor, String disciplina);
+
+	Collection<Disponibilidade> listarDoMonitor(UsuarioIdentificador monitor);
 }

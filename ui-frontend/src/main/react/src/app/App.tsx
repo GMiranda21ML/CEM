@@ -84,6 +84,9 @@ export function App() {
                       {autorizacoesDe('sessao')?.incluir ? 'Agenda de reposição' : 'Minhas sessões'}
                     </ItemMenu>
                   )}
+                  {autorizacoesDe('disponibilidade')?.incluir && (
+                    <ItemMenu caminho="/monitoria/sessao/pesquisa#disponibilidade">Minha disponibilidade</ItemMenu>
+                  )}
                   {autorizacoesDe('falta')?.buscar &&
                     (autorizacoes.includes('ALUNO') || autorizacoes.includes('PROFESSOR')) && (
                       <ItemMenu caminho="/monitoria/falta/pesquisa">Faltas e reposição</ItemMenu>

@@ -15,6 +15,8 @@ import org.apache.commons.lang3.Validate;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.time.Duration;
+import java.time.LocalTime;
 
 public final class DisponibilidadeServico
 		extends AgregadoServicoAbstrato<
@@ -78,10 +80,15 @@ public final class DisponibilidadeServico
 	protected void validarInclusao(Disponibilidade a) {
 		Objects.requireNonNull(a);
 		Validate.isTrue(a.getIdentificador().isEmpty(), "Identificador gerado automaticamente");
+		validarDados(a);
 	}
 
 	@Override
 	protected void validarInclusaoAlteracao(Disponibilidade a) {
+		validarDados(a);
+	}
+
+	private void validarDados(Disponibilidade a) {
 		Objects.requireNonNull(a);
 		Validate.isTrue(
 				papel(Autorizacao.COORDENADOR) || a.getMonitor().equals(usuarioAtual()),
@@ -93,5 +100,25 @@ public final class DisponibilidadeServico
 		Validate.validState(
 				campusRepositorio.buscarPorIdentificador(a.getCampus()).estaAtivo(),
 				"Campus inativo");
+		Validate.isTrue(
+				!a.getInicio().isBefore(LocalTime.of(7, 0))
+						&& !a.getFim().isAfter(LocalTime.of(22, 0)),
+				"A disponibilidade deve estar entre 7h e 22h");
+		var existentes = repositorio.listarDoMonitor(a.getMonitor());
+		long minutosExistentes = 0;
+		for (Disponibilidade existente : existentes) {
+			if (a.getIdentificador().equals(existente.getIdentificador())) continue;
+			Validate.isTrue(
+					existente.getDiaSemana() != a.getDiaSemana()
+							|| !a.getInicio().isBefore(existente.getFim())
+								&& !a.getFim().isAfter(existente.getInicio()),
+					"Disponibilidades semanais não podem se sobrepor");
+			minutosExistentes +=
+					Duration.between(existente.getInicio(), existente.getFim()).toMinutes();
+		}
+		long minutosNovos = Duration.between(a.getInicio(), a.getFim()).toMinutes();
+		Validate.isTrue(
+				minutosExistentes + minutosNovos <= Duration.ofHours(20).toMinutes(),
+				"A disponibilidade não pode ultrapassar 20 horas semanais");
 	}
 }

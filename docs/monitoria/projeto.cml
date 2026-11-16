@@ -94,6 +94,7 @@ BoundedContext monitoria implements monitoria {
 					void alterar(@Disponibilidade agregado);
 					void excluir(@DisponibilidadeIdentificador identificador);
 					Collection<@Disponibilidade> buscarDoMonitor(@UsuarioIdentificador monitor, String disciplina);
+					Collection<@Disponibilidade> listarDoMonitor(@UsuarioIdentificador monitor);
 				}
 			}
 			ValueObject DisponibilidadeIdentificador { String valor }

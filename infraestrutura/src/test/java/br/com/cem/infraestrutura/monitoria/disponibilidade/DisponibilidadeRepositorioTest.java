@@ -107,4 +107,31 @@ class DisponibilidadeRepositorioTest {
 		assertEquals(a.getDisciplina(), repo.buscarPorIdentificador(id).getDisciplina());
 		assertFalse(repo.existePorIdentificador(new DisponibilidadeIdentificador("invalido")));
 	}
+
+	@Test
+	void listaTodasAsDisponibilidadesDoMonitorParaValidarLimitesSemanais() {
+		var repo = new DisponibilidadeRepositorio(jpa, usuariosJpa, campusJpa);
+		for (int dia = 1; dia <= 2; dia++) {
+			repo.incluir(
+					new Disponibilidade(
+							Optional.empty(),
+							"Cálculo I",
+							monitor,
+							campus,
+							dia,
+							LocalTime.of(10, 0),
+							LocalTime.of(12, 0)));
+		}
+		repo.incluir(
+				new Disponibilidade(
+						Optional.empty(),
+						"Física I",
+						aluno,
+						campus,
+						1,
+						LocalTime.of(14, 0),
+						LocalTime.of(16, 0)));
+
+		assertEquals(2, repo.listarDoMonitor(monitor).size());
+	}
 }

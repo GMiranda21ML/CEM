@@ -94,4 +94,11 @@ public class DisponibilidadeRepositorio
 				.map(this::paraAgregado)
 				.toList();
 	}
+
+	@Override
+	public List<Disponibilidade> listarDoMonitor(UsuarioIdentificador monitor) {
+		return repositorioJpa.listarDoMonitor(Long.valueOf(monitor.toString())).stream()
+				.map(this::paraAgregado)
+				.toList();
+	}
 }

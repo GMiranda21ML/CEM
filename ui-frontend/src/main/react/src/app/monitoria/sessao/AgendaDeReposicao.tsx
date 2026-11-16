@@ -61,6 +61,13 @@ export function AgendaDeReposicao() {
   const nome = (id: string) => contexto.pessoas.find((p) => p.identificador === id)?.nome ?? id;
   const alunos = contexto.pessoas.filter((p) => p.papel === 'ALUNO');
   const professores = contexto.pessoas.filter((p) => p.papel === 'PROFESSOR');
+  const horasSemana = disponibilidades.resultado.projecoes
+    .filter((d) => d.monitor === contexto.usuario)
+    .reduce((total, d) => {
+      const [inicioHora, inicioMinuto] = d.inicio.split(':').map(Number);
+      const [fimHora, fimMinuto] = d.fim.split(':').map(Number);
+      return total + (fimHora * 60 + fimMinuto - inicioHora * 60 - inicioMinuto) / 60;
+    }, 0);
   return (
     <>
       <div className="page-header">
@@ -185,9 +192,12 @@ export function AgendaDeReposicao() {
           </section>
         )}
         {autorizacoesDe('disponibilidade')?.incluir && (
-          <section className="panel">
+          <section className="panel" id="disponibilidade">
             <h2>{edicao ? 'Editar disponibilidade' : 'Disponibilidade do monitor'}</h2>
-            <p className="panel-sub">Horários semanais usados nas sugestões de reposição.</p>
+            <p className="panel-sub">
+              Minha semana: {horasSemana} h de 20 h usadas. Horários entre 7h e 22h, sem
+              sobreposição.
+            </p>
             <form
               className="form-grid"
               onSubmit={formDisponibilidade.handleSubmit((v) =>
@@ -262,8 +272,14 @@ export function AgendaDeReposicao() {
                 <input
                   id="disp-inicio"
                   type="time"
+                  min="07:00"
+                  max="21:59"
                   required
-                  {...formDisponibilidade.register('inicio', { required: true })}
+                  {...formDisponibilidade.register('inicio', {
+                    required: true,
+                    min: '07:00',
+                    max: '21:59',
+                  })}
                 />
               </div>
               <div className="field">
@@ -271,8 +287,15 @@ export function AgendaDeReposicao() {
                 <input
                   id="disp-fim"
                   type="time"
+                  min="07:01"
+                  max="22:00"
                   required
-                  {...formDisponibilidade.register('fim', { required: true })}
+                  {...formDisponibilidade.register('fim', {
+                    required: true,
+                    min: '07:01',
+                    max: '22:00',
+                    validate: (fim) => !formDisponibilidade.getValues('inicio') || fim > formDisponibilidade.getValues('inicio'),
+                  })}
                 />
               </div>
               <div className="form-actions full">

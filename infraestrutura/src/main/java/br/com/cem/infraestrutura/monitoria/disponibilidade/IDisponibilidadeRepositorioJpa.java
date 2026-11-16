@@ -22,4 +22,7 @@ select new br.com.cem.aplicacao.monitoria.disponibilidade.DisponibilidadeProjeca
 			"select a from DisponibilidadeJpa a where a.monitor.identificador=:monitor and"
 					+ " a.disciplina=:disciplina")
 	List<DisponibilidadeJpa> buscarDoMonitor(Long monitor, String disciplina);
+
+	@Query("select a from DisponibilidadeJpa a where a.monitor.identificador=:monitor")
+	List<DisponibilidadeJpa> listarDoMonitor(Long monitor);
 }
