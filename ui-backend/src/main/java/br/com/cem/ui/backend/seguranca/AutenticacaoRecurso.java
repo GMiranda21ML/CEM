@@ -1,6 +1,8 @@
 package br.com.cem.ui.backend.seguranca;
 
 import br.com.cem.dominio.acesso.campus.CampusAutorizacoes;
+import br.com.cem.dominio.acesso.curso.CursoAutorizacoes;
+import br.com.cem.dominio.acesso.disciplina.DisciplinaAutorizacoes;
 import br.com.cem.dominio.acesso.convite.ConviteAutorizacoes;
 import br.com.cem.dominio.acesso.dominioemail.DominioEmail;
 import br.com.cem.dominio.acesso.usuario.UsuarioAutorizacoes;
@@ -21,6 +23,8 @@ public class AutenticacaoRecurso extends AutenticacaoRecursoAbstrato {
 	private final UsuarioAutorizacoes usuarios;
 	private final ConviteAutorizacoes convite;
 	private final CampusAutorizacoes campus;
+	private final CursoAutorizacoes curso;
+	private final DisciplinaAutorizacoes disciplina;
 	private final AvaliacaoAutorizacoes avaliacao;
 	private final CertificadoAutorizacoes certificado;
 	private final AgregadoAutorizacoes<br.com.cem.dominio.comunicacao.faq.Faq> faq;
@@ -39,6 +43,8 @@ public class AutenticacaoRecurso extends AutenticacaoRecursoAbstrato {
 			UsuarioAutorizacoes usuarios,
 			ConviteAutorizacoes convite,
 			CampusAutorizacoes campus,
+			CursoAutorizacoes curso,
+			DisciplinaAutorizacoes disciplina,
 			AvaliacaoAutorizacoes avaliacao,
 			CertificadoAutorizacoes certificado,
 			AgregadoAutorizacoes<br.com.cem.dominio.comunicacao.faq.Faq> faq,
@@ -56,6 +62,8 @@ public class AutenticacaoRecurso extends AutenticacaoRecursoAbstrato {
 		this.usuarios = Objects.requireNonNull(usuarios);
 		this.convite = Objects.requireNonNull(convite);
 		this.campus = Objects.requireNonNull(campus);
+		this.curso = Objects.requireNonNull(curso);
+		this.disciplina = Objects.requireNonNull(disciplina);
 		this.avaliacao = Objects.requireNonNull(avaliacao);
 		this.certificado = Objects.requireNonNull(certificado);
 		this.faq = Objects.requireNonNull(faq);
@@ -115,6 +123,10 @@ public class AutenticacaoRecurso extends AutenticacaoRecursoAbstrato {
 	public CampusAutorizacoes getCampus() {
 		return campus;
 	}
+
+	public CursoAutorizacoes getCurso() { return curso; }
+
+	public DisciplinaAutorizacoes getDisciplina() { return disciplina; }
 
 	public AvaliacaoAutorizacoes getAvaliacao() {
 		return avaliacao;

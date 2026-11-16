@@ -1,5 +1,5 @@
 // Modelo de banco de dados do subdomínio acesso, a partir de docs/acesso/projeto.cml.
-// Prefixos usados neste arquivo: DEM (DominioEmail), USR (Usuario), CNV (Convite), CAM (Campus).
+// Prefixos usados neste arquivo: DEM (DominioEmail), USR (Usuario), CNV (Convite), CAM (Campus), CRS (Curso), DSC (Disciplina).
 
 Enum PAPEL {
   ADMINISTRADOR
@@ -66,3 +66,33 @@ Table CAM_CAMPUS {
     (CAM_INSTITUICAO, CAM_SITUACAO) [note: 'Listagem de campi da instituição por situação']
   }
 }
+
+Table CRS_CURSO {
+  CRS_ID integer [pk, increment]
+  CRS_INSTITUICAO varchar(180) [not null]
+  CRS_NOME varchar(150) [not null]
+  CRS_SIGLA varchar(20) [not null]
+
+  indexes {
+    (CRS_INSTITUICAO, CRS_NOME) [unique, note: 'Nome do curso único dentro da instituição']
+    (CRS_INSTITUICAO, CRS_SIGLA) [unique, note: 'Sigla do curso única dentro da instituição']
+  }
+}
+
+Table DSC_DISCIPLINA {
+  DSC_ID integer [pk, increment]
+  DSC_INSTITUICAO varchar(180) [not null]
+  CRS_ID integer [not null]
+  USR_ID integer [not null]
+  DSC_NOME varchar(150) [not null]
+  DSC_CODIGO varchar(7) [not null]
+  DSC_AREA varchar(100) [not null]
+
+  indexes {
+    (DSC_INSTITUICAO, DSC_CODIGO) [unique, note: 'Código único na instituição']
+    (CRS_ID, DSC_NOME) [unique, note: 'Nome único dentro do curso']
+  }
+}
+
+Ref: DSC_DISCIPLINA.CRS_ID > CRS_CURSO.CRS_ID
+Ref: DSC_DISCIPLINA.USR_ID > USR_USUARIO.USR_ID

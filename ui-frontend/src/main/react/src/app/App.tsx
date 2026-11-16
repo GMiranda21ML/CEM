@@ -62,6 +62,8 @@ export function App() {
                 <>
                   <div className="nav-group">Área do coordenador</div>
                   <ItemMenu caminho="/acesso/usuarios">Usuários e acessos</ItemMenu>
+                  {autorizacoesDe('curso')?.buscar && <ItemMenu caminho="/acesso/curso/pesquisa">Cursos</ItemMenu>}
+                  {autorizacoesDe('disciplina')?.buscar && <ItemMenu caminho="/acesso/disciplina/pesquisa">Disciplinas e áreas</ItemMenu>}
                 </>
               )}
 

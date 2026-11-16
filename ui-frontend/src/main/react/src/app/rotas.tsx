@@ -88,6 +88,20 @@ export const rotas = [
               return { Component: modulo.UsuariosEAcessos, loader: modulo.loader };
             },
           },
+          {
+            path: 'acesso/curso/pesquisa',
+            lazy: async () => {
+              const modulo = await import('./acesso/cursos/Cursos');
+              return { Component: modulo.Cursos, loader: modulo.loader };
+            },
+          },
+          {
+            path: 'acesso/disciplina/pesquisa',
+            lazy: async () => {
+              const modulo = await import('./acesso/cursos/Disciplinas');
+              return { Component: modulo.Disciplinas, loader: modulo.loader };
+            },
+          },
         ],
       },
     ],

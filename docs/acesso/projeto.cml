@@ -185,9 +185,84 @@ BoundedContext acesso implements acesso {
 			}
 		}
 
-		Aggregate ReferenciasAcademicas {
+		Aggregate Curso {
+			Entity Curso {
+				aggregateRoot
+
+				-CursoIdentificador identificador key
+				-InstituicaoIdentificador instituicao
+				String nome
+				String sigla
+
+				Repository CursoRepository {
+					@Curso incluir(@Curso agregado);
+					boolean existePorIdentificador(@CursoIdentificador identificador);
+					@Curso buscarPorIdentificador(@CursoIdentificador identificador);
+					void excluir(@CursoIdentificador identificador);
+
+					boolean existePorNome(String nome, @InstituicaoIdentificador instituicao);
+					boolean existePorSigla(String sigla, @InstituicaoIdentificador instituicao);
+					boolean possuiDisciplinasVinculadas(@CursoIdentificador identificador);
+					boolean possuiUsuariosVinculados(@CursoIdentificador identificador);
+				}
+			}
+
+			// artificial
+			ValueObject CursoIdentificador {
+				String valor
+			}
+
+			Service CursoServico {
+				@Curso cadastrar(String nome, String sigla);
+				@Curso buscar(@CursoIdentificador identificador);
+				void excluir(@CursoIdentificador identificador);
+			}
+		}
+
+		Aggregate Disciplina {
+			Entity Disciplina {
+				aggregateRoot
+
+				-DisciplinaIdentificador identificador key
+				-InstituicaoIdentificador instituicao
+				-CursoIdentificador curso
+				-UsuarioIdentificador professor
+				String nome
+				-DisciplinaCodigo codigo
+				String area
+
+				Repository DisciplinaRepository {
+					@Disciplina incluir(@Disciplina agregado);
+					boolean existePorIdentificador(@DisciplinaIdentificador identificador);
+					@Disciplina buscarPorIdentificador(@DisciplinaIdentificador identificador);
+					void alterar(@Disciplina agregado);
+					void excluir(@DisciplinaIdentificador identificador);
+
+					boolean existePorCodigo(@DisciplinaCodigo codigo, @InstituicaoIdentificador instituicao);
+					boolean existePorNomeNoCurso(String nome, @CursoIdentificador curso, @DisciplinaIdentificador identificadorIgnorado);
+					boolean possuiVinculosMonitoria(@DisciplinaIdentificador identificador);
+				}
+			}
+
+			// artificial
 			ValueObject DisciplinaIdentificador {
 				String valor
+			}
+
+			// natural (padrão AAA0000)
+			ValueObject DisciplinaCodigo {
+				String valor
+			}
+
+			Service DisciplinaServico {
+				@Disciplina cadastrar(String nome, @DisciplinaCodigo codigo, String area, @CursoIdentificador curso, @UsuarioIdentificador professor);
+				@Disciplina buscar(@DisciplinaIdentificador identificador);
+				void alterar(@Disciplina agregado);
+				void excluir(@DisciplinaIdentificador identificador);
+			}
+
+			Service ProfessorValidadorServico {
+				boolean isProfessorValido(@UsuarioIdentificador professor, @CursoIdentificador curso, @InstituicaoIdentificador instituicao);
 			}
 		}
 	}
