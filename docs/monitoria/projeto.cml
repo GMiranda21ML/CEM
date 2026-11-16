@@ -46,9 +46,16 @@ BoundedContext monitoria implements monitoria {
 				void editar(@AvaliacaoIdentificador identificador, int nota, String comentario);
 			}
 		}
-		// Funcionalidades F009, F010 e F011
+		// Funcionalidades F008, F009, F010 e F011
 		Aggregate Sessao {
 			ValueObject SessaoIdentificador { String valor }
+			enum SituacaoRespostaSessao { SEM_RESPOSTA, VAI_PARTICIPAR, NAO_VAI_PARTICIPAR }
+			ValueObject RespostaSessao {
+				-UsuarioIdentificador aluno
+				SituacaoRespostaSessao situacao
+				nullable String motivo
+				nullable DateTime inicioSugerido
+			}
 			Entity Sessao {
 				aggregateRoot
 				-SessaoIdentificador identificador key
@@ -56,9 +63,12 @@ BoundedContext monitoria implements monitoria {
 				-UsuarioIdentificador professor
 				-UsuarioIdentificador monitor
 				-CampusIdentificador campus
+				String sala
 				Collection<UsuarioIdentificador> alunos
+				Collection<RespostaSessao> respostas
 				DateTime inicio
 				DateTime fim
+				nullable DateTime inicioAnterior
 				boolean cancelada
 				Repository SessaoRepository {
 					boolean existePorMonitor(@UsuarioIdentificador monitor);
@@ -73,8 +83,11 @@ BoundedContext monitoria implements monitoria {
 			}
 			Service SessaoServico {
 				@Sessao buscar(@SessaoIdentificador identificador);
+				@Sessao registrar(@Sessao agregado);
+				@Sessao adicionarAluno(@SessaoIdentificador sessao, @UsuarioIdentificador aluno);
+				@Sessao responder(@SessaoIdentificador sessao, @RespostaSessao resposta);
+				@Sessao remarcarParaSugestao(@SessaoIdentificador sessao, @UsuarioIdentificador aluno);
 				void cancelar(@SessaoIdentificador identificador);
-				@Sessao incluir(@Sessao agregado);
 			}
 		}
 		Aggregate Disponibilidade {

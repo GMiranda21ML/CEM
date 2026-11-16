@@ -29,15 +29,18 @@ export function AgendaDeReposicao() {
   const { data: disponibilidades } = useSuspenseQuery(consultaDisponibilidades());
   const { data: faltas } = useSuspenseQuery(consultaFaltas());
   const [edicao, definirEdicao] = useState<Disponibilidade | null>(null);
+  const [filtro, definirFiltro] = useState({ texto: '', de: '', ate: '', situacao: 'TODAS' });
   const formSessao = useForm<{
     disciplina: string;
     professor: string;
     monitor: string;
     campus: string;
+    sala: string;
     alunos: string[];
     inicio: string;
     fim: string;
-  }>({ defaultValues: { alunos: [] } });
+  }>({ defaultValues: { alunos: [], monitor: contexto.usuario } });
+  const monitorSelecionado = formSessao.watch('monitor');
   const formDisponibilidade = useForm<{
     disciplina: string;
     monitor: string;
@@ -48,7 +51,7 @@ export function AgendaDeReposicao() {
   }>({ defaultValues: { monitor: contexto.usuario, diaSemana: '1' } });
   const acao = useAcao(() => {
     definirEdicao(null);
-    formSessao.reset();
+    formSessao.reset({ alunos: [], monitor: contexto.usuario });
     formDisponibilidade.reset({
       monitor: contexto.usuario,
       diaSemana: '1',
@@ -60,6 +63,8 @@ export function AgendaDeReposicao() {
   });
   const nome = (id: string) => contexto.pessoas.find((p) => p.identificador === id)?.nome ?? id;
   const alunos = contexto.pessoas.filter((p) => p.papel === 'ALUNO');
+  const cursoMonitor = contexto.pessoas.find((p) => p.identificador === monitorSelecionado)?.curso ?? contexto.cursoUsuario;
+  const alunosElegiveis = alunos.filter((p) => !cursoMonitor || p.curso === cursoMonitor);
   const professores = contexto.pessoas.filter((p) => p.papel === 'PROFESSOR');
   const horasSemana = disponibilidades.resultado.projecoes
     .filter((d) => d.monitor === contexto.usuario)
@@ -68,6 +73,13 @@ export function AgendaDeReposicao() {
       const [fimHora, fimMinuto] = d.fim.split(':').map(Number);
       return total + (fimHora * 60 + fimMinuto - inicioHora * 60 - inicioMinuto) / 60;
     }, 0);
+  const sessoesFiltradas = sessoes.resultado.projecoes.filter((sessao) => {
+    const inicio = new Date(sessao.inicio);
+    const textoOk = !filtro.texto || sessao.disciplina.toLocaleLowerCase().includes(filtro.texto.toLocaleLowerCase());
+    const dataOk = (!filtro.de || inicio >= new Date(`${filtro.de}T00:00:00`)) && (!filtro.ate || inicio <= new Date(`${filtro.ate}T23:59:59`));
+    const situacaoOk = filtro.situacao === 'TODAS' || (filtro.situacao === 'CANCELADAS' ? sessao.cancelada : filtro.situacao === 'HISTORICO' ? !sessao.cancelada && new Date(sessao.fim) <= new Date() : !sessao.cancelada && new Date(sessao.fim) > new Date());
+    return textoOk && dataOk && situacaoOk;
+  });
   return (
     <>
       <div className="page-header">
@@ -82,16 +94,21 @@ export function AgendaDeReposicao() {
         </div>
       </div>
       <div className="content-grid">
-        {coordenador && (
+        {(coordenador || autorizacoes.includes('ALUNO')) && (
           <section className="panel">
             <h2>Cadastrar sessão</h2>
-            <p className="panel-sub">Vincule professor, monitor e alunos da disciplina.</p>
+            <p className="panel-sub">Registre a sessão e convide alunos do curso do monitor.</p>
             <form
               className="form-grid"
               onSubmit={formSessao.handleSubmit((v) =>
                 acao.mutate({
-                  caminho: 'monitoria/sessao/incluir',
-                  corpo: { ...v, identificador: null, cancelada: false },
+                  caminho: 'monitoria/sessao/registrar',
+                  corpo: {
+                    ...v,
+                    monitor: coordenador ? v.monitor : contexto.usuario,
+                    identificador: null,
+                    cancelada: false,
+                  },
                 }),
               )}
             >
@@ -119,7 +136,7 @@ export function AgendaDeReposicao() {
                   ))}
                 </select>
               </div>
-              <div className="field">
+              {coordenador ? <div className="field">
                 <label htmlFor="sessao-monitor">Monitor *</label>
                 <select
                   id="sessao-monitor"
@@ -133,7 +150,7 @@ export function AgendaDeReposicao() {
                     </option>
                   ))}
                 </select>
-              </div>
+              </div> : <div className="field"><label>Monitor</label><input value={nome(contexto.usuario)} readOnly /></div>}
               <div className="field">
                 <label htmlFor="sessao-campus">Campus *</label>
                 <select
@@ -157,13 +174,17 @@ export function AgendaDeReposicao() {
                   required
                   {...formSessao.register('alunos', { required: true })}
                 >
-                  {alunos.map((p) => (
+                  {alunosElegiveis.map((p) => (
                     <option key={p.identificador} value={p.identificador}>
                       {p.nome}
                     </option>
                   ))}
                 </select>
                 <small>Selecione um ou mais alunos.</small>
+              </div>
+              <div className="field">
+                <label htmlFor="sessao-sala">Sala *</label>
+                <input id="sessao-sala" required maxLength={100} {...formSessao.register('sala', { required: true })} />
               </div>
               <div className="field">
                 <label htmlFor="sessao-inicio">Início *</label>
@@ -363,7 +384,13 @@ export function AgendaDeReposicao() {
       </section>
       <section className="panel">
         <h2>{coordenador ? 'Sessões' : 'Minhas sessões'}</h2>
-        {sessoes.resultado.projecoes.map((s) => (
+        <div className="form-grid">
+          <div className="field"><label htmlFor="filtro-sessao-disciplina">Disciplina</label><input id="filtro-sessao-disciplina" value={filtro.texto} onChange={(e) => definirFiltro({ ...filtro, texto: e.target.value })} /></div>
+          <div className="field"><label htmlFor="filtro-sessao-de">A partir de</label><input id="filtro-sessao-de" type="date" value={filtro.de} onChange={(e) => definirFiltro({ ...filtro, de: e.target.value })} /></div>
+          <div className="field"><label htmlFor="filtro-sessao-ate">Até</label><input id="filtro-sessao-ate" type="date" value={filtro.ate} onChange={(e) => definirFiltro({ ...filtro, ate: e.target.value })} /></div>
+          <div className="field"><label htmlFor="filtro-sessao-situacao">Período</label><select id="filtro-sessao-situacao" value={filtro.situacao} onChange={(e) => definirFiltro({ ...filtro, situacao: e.target.value })}><option value="TODAS">Todas</option><option value="FUTURAS">Próximas</option><option value="HISTORICO">Histórico</option><option value="CANCELADAS">Canceladas</option></select></div>
+        </div>
+        {sessoesFiltradas.map((s) => (
           <CartaoSessao
             key={s.identificador}
             sessao={s}
@@ -371,7 +398,7 @@ export function AgendaDeReposicao() {
             faltas={faltas.resultado.projecoes}
           />
         ))}
-        {!sessoes.resultado.total && <p className="empty">Nenhuma sessão cadastrada</p>}
+        {!sessoesFiltradas.length && <p className="empty">Nenhuma sessão encontrada para os filtros selecionados</p>}
       </section>
     </>
   );

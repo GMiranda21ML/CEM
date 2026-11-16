@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { data, useAcao } from '../../comunicacao/api';
-import { consultaSessao, type Contexto, type Falta, type Sessao } from '../api';
+import { consultaSessao, type Contexto, type Falta, type RespostaSessao, type Sessao } from '../api';
 export function CartaoSessao({
   sessao,
   contexto,
@@ -17,6 +17,8 @@ export function CartaoSessao({
   const avaliacao = useForm<{ nota: string; comentario: string }>({
     defaultValues: { nota: '5', comentario: '' },
   });
+  const respostaForm = useForm<{ motivo: string; inicioSugerido: string }>({ defaultValues: { motivo: '', inicioSugerido: '' } });
+  const conviteForm = useForm<{ aluno: string }>({ defaultValues: { aluno: '' } });
   const [aberto, definirAberto] = useState(false);
   const [editando, definirEditando] = useState(false);
   const acao = useAcao(() => {
@@ -31,6 +33,10 @@ export function CartaoSessao({
     !sessao.cancelada &&
     (sessao.monitor === contexto.usuario || sessao.professor === contexto.usuario);
   const nome = (id: string) => contexto.pessoas.find((p) => p.identificador === id)?.nome ?? id;
+  const respostas: RespostaSessao[] = detalhe?.agregado.respostas ?? [];
+  const minhaResposta = respostas.find((r) => r.aluno === contexto.usuario);
+  const monitor = sessao.monitor === contexto.usuario;
+  const convidados = contexto.pessoas.filter((p) => p.papel === 'ALUNO' && p.identificador !== sessao.monitor && !sessao.alunos.includes(p.identificador) && (!contexto.pessoas.find((m) => m.identificador === sessao.monitor)?.curso || p.curso === contexto.pessoas.find((m) => m.identificador === sessao.monitor)?.curso));
   return (
     <article className="item-card">
       <div className="item-card-head">
@@ -42,6 +48,8 @@ export function CartaoSessao({
           <p className="tiny">
             Monitor: {nome(sessao.monitor)} ·{' '}
             {contexto.campus.find((c) => c.identificador === sessao.campus)?.nome ?? 'Campus'}
+            {sessao.sala && ` · ${sessao.sala}`}
+            {sessao.inicioAnterior && ` · Remarcada (era ${data(sessao.inicioAnterior)} às ${sessao.inicioAnterior.slice(11, 16)})`}
             {faltas.some((f) => f.reposicao === sessao.identificador) && ' · Reposição'}
           </p>
         </div>
@@ -49,6 +57,39 @@ export function CartaoSessao({
           {sessao.cancelada ? 'Cancelada' : encerrada ? 'Realizada' : 'Agendada'}
         </span>
       </div>
+      {monitor && !sessao.cancelada && !encerrada && (
+        <div className="absence-box">
+          <strong>Confirmações dos alunos</strong>
+          {respostas.map((r) => (
+            <p key={r.aluno} className="tiny">
+              {r.situacao === 'VAI_PARTICIPAR' ? '✓' : r.situacao === 'NAO_VAI_PARTICIPAR' ? '✕' : '?'} {nome(r.aluno)}
+              {r.motivo && ` · ${r.motivo}`}
+              {r.inicioSugerido && ` · Sugestão: ${data(r.inicioSugerido)} às ${r.inicioSugerido.slice(11, 16)}`}
+              {r.situacao === 'NAO_VAI_PARTICIPAR' && r.inicioSugerido && (
+                <button className="button button-small" disabled={acao.isPending} onClick={() => acao.mutate({ caminho: `monitoria/sessao/${sessao.identificador}/remarcar-sugestao`, corpo: { aluno: r.aluno } })}>Remarcar para essa data</button>
+              )}
+            </p>
+          ))}
+          <form className="row-actions" onSubmit={conviteForm.handleSubmit((v) => acao.mutate({ caminho: `monitoria/sessao/${sessao.identificador}/adicionar-aluno`, corpo: v }))}>
+            <select aria-label="Adicionar aluno" required {...conviteForm.register('aluno', { required: true })}>
+              <option value="">Adicionar aluno…</option>
+              {convidados.map((p) => <option key={p.identificador} value={p.identificador}>{p.nome}</option>)}
+            </select>
+            <button className="button button-small" disabled={acao.isPending || convidados.length === 0}>Convidar</button>
+          </form>
+        </div>
+      )}
+      {aluno && !sessao.cancelada && new Date(sessao.inicio) > new Date() && (
+          <details className="faq-item">
+            <summary>Responder sobre a sessão {minhaResposta?.situacao === 'VAI_PARTICIPAR' ? '· Vou participar' : minhaResposta?.situacao === 'NAO_VAI_PARTICIPAR' ? '· Não poderei ir' : ''}</summary>
+            <form className="form-grid" onSubmit={respostaForm.handleSubmit((v) => acao.mutate({ caminho: `monitoria/sessao/${sessao.identificador}/responder`, corpo: { aluno: contexto.usuario, situacao: 'NAO_VAI_PARTICIPAR', motivo: v.motivo || null, inicioSugerido: v.inicioSugerido || null } }))}>
+              <button type="button" className="button button-primary" disabled={acao.isPending} onClick={() => acao.mutate({ caminho: `monitoria/sessao/${sessao.identificador}/responder`, corpo: { aluno: contexto.usuario, situacao: 'VAI_PARTICIPAR', motivo: null, inicioSugerido: null } })}>Vou participar</button>
+              <div className="field full"><label htmlFor={`motivo-${sessao.identificador}`}>Se não puder, explique (opcional)</label><textarea id={`motivo-${sessao.identificador}`} maxLength={1000} {...respostaForm.register('motivo')} /></div>
+              <div className="field full"><label htmlFor={`sugestao-${sessao.identificador}`}>Sugira outro horário (opcional)</label><input id={`sugestao-${sessao.identificador}`} type="datetime-local" {...respostaForm.register('inicioSugerido')} /></div>
+              <button className="button" disabled={acao.isPending}>Não poderei ir</button>
+            </form>
+          </details>
+      )}
       {podeCancelar && (
         <button
           className="button button-danger button-small"

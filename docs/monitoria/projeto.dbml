@@ -22,18 +22,34 @@ Table AVL_AVALIACAO {
   }
 }
 
-// Funcionalidades F009, F010 e F011
+// Funcionalidades F008, F009, F010 e F011
 Table SES_SESSAO {
   SES_ID bigint [pk, increment]
   SES_DISCIPLINA varchar(150) [not null]
   SES_PROFESSOR_ID bigint [not null]
   SES_MONITOR_ID bigint [not null]
   CAM_ID bigint [not null]
+  SES_SALA varchar(100) [note: 'Opcional em registros legados anteriores à F008']
   SES_INICIO datetime [not null]
   SES_FIM datetime [not null]
+  SES_INICIO_ANTERIOR datetime
   SES_CANCELADA boolean [not null]
   indexes {
     (SES_MONITOR_ID, SES_INICIO, SES_FIM)
+  }
+}
+
+Table SSR_SESSAO_RESPOSTA {
+  SES_ID bigint [not null]
+  USR_ID bigint [not null]
+  SSR_INDICE int [not null]
+  SSR_SITUACAO varchar(30) [not null]
+  SSR_MOTIVO varchar(1000)
+  SSR_INICIO_SUGERIDO datetime
+  indexes {
+    (SES_ID, SSR_INDICE) [pk]
+    (SES_ID, USR_ID) [unique]
+    USR_ID
   }
 }
 
@@ -81,5 +97,7 @@ Table ALF_ALERTA {
 }
 
 Ref: SAP_SESSAO_ALUNO.SES_ID > SES_SESSAO.SES_ID
+Ref: SSR_SESSAO_RESPOSTA.SES_ID > SES_SESSAO.SES_ID
+Ref: SSR_SESSAO_RESPOSTA.USR_ID > USR_USUARIO.USR_ID
 Ref: FLT_FALTA.SES_ID > SES_SESSAO.SES_ID
 Ref: FLT_FALTA.SES_REPOSICAO_ID > SES_SESSAO.SES_ID

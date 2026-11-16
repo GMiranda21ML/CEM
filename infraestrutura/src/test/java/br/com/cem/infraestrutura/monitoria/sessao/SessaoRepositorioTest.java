@@ -15,6 +15,8 @@ import br.com.cem.dominio.acesso.usuario.UsuarioSenha;
 import br.com.cem.dominio.acesso.usuario.UsuarioSituacao;
 import br.com.cem.dominio.monitoria.sessao.Sessao;
 import br.com.cem.dominio.monitoria.sessao.SessaoIdentificador;
+import br.com.cem.dominio.monitoria.sessao.RespostaSessao;
+import br.com.cem.dominio.monitoria.sessao.SituacaoRespostaSessao;
 import br.com.cem.infraestrutura.acesso.campus.CampusRepositorio;
 import br.com.cem.infraestrutura.acesso.campus.ICampusRepositorioJpa;
 import br.com.cem.infraestrutura.acesso.usuario.IUsuarioRepositorioJpa;
@@ -73,15 +75,18 @@ class SessaoRepositorioTest {
 		var repositorioSessao = new SessaoRepositorio(sessoesJpa, usuariosJpa, campusJpa);
 		sessao =
 				repositorioSessao.incluir(
-						new Sessao(
+						Sessao.restaurar(
 								Optional.empty(),
 								"Cálculo I",
 								professor,
 								monitor,
 								campus,
+								"Sala 12",
 								List.of(aluno),
+								List.of(new RespostaSessao(aluno, SituacaoRespostaSessao.NAO_VAI_PARTICIPAR, Optional.of("Imprevisto"), Optional.of(agora.plusDays(2)))),
 								agora.minusDays(1),
 								agora.minusDays(1).plusHours(1),
+								Optional.of(agora.minusDays(2)),
 								false));
 	}
 
@@ -112,6 +117,12 @@ class SessaoRepositorioTest {
 		var id = a.getIdentificador().orElseThrow();
 		assertTrue(repo.existePorIdentificador(id));
 		assertEquals(a.getDisciplina(), repo.buscarPorIdentificador(id).getDisciplina());
+		var persistida = repo.buscarPorIdentificador(id);
+		assertEquals("Sala 12", persistida.getSala());
+		assertEquals(Optional.of(agora.minusDays(2)), persistida.getInicioAnterior());
+		assertEquals(SituacaoRespostaSessao.NAO_VAI_PARTICIPAR, persistida.getRespostas().iterator().next().getSituacao());
+		assertEquals(Optional.of("Imprevisto"), persistida.getRespostas().iterator().next().getMotivo());
+		assertEquals(Optional.of(agora.plusDays(2)), persistida.getRespostas().iterator().next().getInicioSugerido());
 		assertFalse(repo.existePorIdentificador(new SessaoIdentificador("invalido")));
 		assertTrue(repo.conflita(monitor, aluno, a.getInicio(), a.getFim()));
 		assertFalse(repo.conflita(monitor, aluno, a.getFim(), a.getFim().plusHours(1)));

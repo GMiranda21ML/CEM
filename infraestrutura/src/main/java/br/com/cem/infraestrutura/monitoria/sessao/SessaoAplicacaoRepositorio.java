@@ -26,14 +26,16 @@ public class SessaoAplicacaoRepositorio
 	public ContextoAgenda contexto() {
 		var usuario =
 				usuarios.buscarPorEmail(new UsuarioEmail(seguranca.getUsuario()))
-						.getIdentificador()
-						.orElseThrow();
+						;
+		var identificador = usuario.getIdentificador().orElseThrow();
 		return new ContextoAgenda(
-				usuario.toString(),
+				identificador.toString(),
 				repositorioJpa.pessoas(
 						seguranca.possuiAutorizacao(Autorizacao.COORDENADOR.name()),
-						Long.valueOf(usuario.toString())),
-				repositorioJpa.campusAtivos());
+						Long.valueOf(identificador.toString()),
+						usuario.getCurso()),
+				repositorioJpa.campusAtivos(),
+				usuario.getCurso());
 	}
 
 	private final ISessaoRepositorioJpa repositorioJpa;

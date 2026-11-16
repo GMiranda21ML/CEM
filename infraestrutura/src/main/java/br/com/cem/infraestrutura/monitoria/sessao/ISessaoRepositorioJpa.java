@@ -20,20 +20,21 @@ public interface ISessaoRepositorioJpa extends JpaRepository<SessaoJpa, Long> {
 	boolean existePorMonitor(Long monitor);
 
 	@Override
-	@EntityGraph(attributePaths = "alunos")
+	@EntityGraph(attributePaths = {"alunos", "respostas"})
 	Optional<SessaoJpa> findById(Long identificador);
 
 	@Query(
 """
-select new br.com.cem.aplicacao.monitoria.sessao.PessoaAgendaProjecao(u.identificador,u.nome,u.papel)
-from UsuarioJpa u where :coordenador=true or u.identificador=:usuario or exists
+select new br.com.cem.aplicacao.monitoria.sessao.PessoaAgendaProjecao(u.identificador,u.nome,u.papel,u.curso)
+from UsuarioJpa u where u.situacao=br.com.cem.dominio.acesso.usuario.UsuarioSituacao.ATIVO and
+(:coordenador=true or u.identificador=:usuario or (:curso is not null and lower(u.curso)=lower(:curso)) or exists
 (select 1 from SessaoJpa s where
  (s.professor.identificador=:usuario or s.monitor.identificador=:usuario or exists
   (select 1 from SessaoJpa s2 join s2.alunos a where s2=s and a.identificador=:usuario))
- and (s.professor=u or s.monitor=u or u member of s.alunos))
+ and (s.professor=u or s.monitor=u or u member of s.alunos)))
 order by u.nome
 """)
-	List<PessoaAgendaProjecao> pessoas(boolean coordenador, Long usuario);
+	List<PessoaAgendaProjecao> pessoas(boolean coordenador, Long usuario, @Nullable String curso);
 
 	@Query(
 """
@@ -44,7 +45,7 @@ from CampusJpa c where c.situacao=br.com.cem.dominio.acesso.campus.CampusSituaca
 
 	@Query(
 """
-select new br.com.cem.aplicacao.monitoria.sessao.SessaoProjecao(a.identificador, a.disciplina, a.professor.identificador, a.monitor.identificador, a.campus.identificador, a.inicio, a.fim, a.cancelada) from SessaoJpa a where (:coordenador = true or a.monitor.identificador = :usuario or a.professor.identificador = :usuario or exists (select 1 from SessaoJpa s join s.alunos u where s = a and u.identificador = :usuario)) and (:texto is null or lower(a.disciplina) like :texto escape '\\')
+select new br.com.cem.aplicacao.monitoria.sessao.SessaoProjecao(a.identificador, a.disciplina, a.professor.identificador, a.monitor.identificador, a.campus.identificador, coalesce(a.sala, 'Sala não informada'), a.inicio, a.fim, a.cancelada, a.inicioAnterior) from SessaoJpa a where (:coordenador = true or a.monitor.identificador = :usuario or a.professor.identificador = :usuario or exists (select 1 from SessaoJpa s join s.alunos u where s = a and u.identificador = :usuario)) and (:texto is null or lower(a.disciplina) like :texto escape '\\')
 """)
 	Page<SessaoProjecao> pesquisar(
 			boolean coordenador, Long usuario, @Nullable String texto, Pageable pageable);
@@ -54,6 +55,11 @@ select new br.com.cem.aplicacao.monitoria.sessao.SessaoProjecao(a.identificador,
 					+ " a.fim > :inicio and (a.monitor.identificador=:monitor or"
 					+ " a.monitor.identificador=:aluno or exists (select 1 from SessaoJpa s join"
 					+ " s.alunos u where s=a and (u.identificador=:aluno or"
-					+ " u.identificador=:monitor)))")
-	boolean conflita(Long monitor, Long aluno, LocalDateTime inicio, LocalDateTime fim);
+					+ " u.identificador=:monitor))) and (:ignorada is null or a.identificador<>:ignorada)")
+	boolean conflita(
+			Long monitor,
+			Long aluno,
+			LocalDateTime inicio,
+			LocalDateTime fim,
+			@Nullable Long ignorada);
 }

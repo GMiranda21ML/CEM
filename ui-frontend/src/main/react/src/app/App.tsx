@@ -79,9 +79,9 @@ export function App() {
                   {autorizacoesDe('aviso')?.buscar && (
                     <ItemMenu caminho="/comunicacao/aviso/pesquisa">Mural de avisos</ItemMenu>
                   )}
-                  {autorizacoesDe('sessao')?.buscar && (
+                  {(autorizacoesDe('sessao')?.buscar || autorizacoes.includes('ALUNO')) && (
                     <ItemMenu caminho="/monitoria/sessao/pesquisa">
-                      {autorizacoesDe('sessao')?.incluir ? 'Agenda de reposição' : 'Minhas sessões'}
+                      {autorizacoes.includes('COORDENADOR') ? 'Agenda de reposição' : 'Minhas sessões'}
                     </ItemMenu>
                   )}
                   {autorizacoesDe('disponibilidade')?.incluir && (

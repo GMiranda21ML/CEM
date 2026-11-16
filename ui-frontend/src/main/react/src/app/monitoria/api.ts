@@ -7,10 +7,20 @@ export interface Sessao {
   professor: string;
   monitor: string;
   campus: string;
+  sala: string;
   alunos: string[];
   inicio: string;
   fim: string;
   cancelada: boolean;
+  respostas?: RespostaSessao[];
+  inicioAnterior?: string | null;
+}
+export type SituacaoRespostaSessao = 'SEM_RESPOSTA' | 'VAI_PARTICIPAR' | 'NAO_VAI_PARTICIPAR';
+export interface RespostaSessao {
+  aluno: string;
+  situacao: SituacaoRespostaSessao;
+  motivo?: string | null;
+  inicioSugerido?: string | null;
 }
 export interface Falta {
   reposicao: string | null;
@@ -46,8 +56,9 @@ export interface Sugestao {
 }
 export interface Contexto {
   usuario: string;
-  pessoas: { identificador: string; nome: string; papel: string }[];
+  pessoas: { identificador: string; nome: string; papel: string; curso?: string | null }[];
   campus: { identificador: string; nome: string }[];
+  cursoUsuario?: string | null;
 }
 export const consultaSessoes = () => pesquisa<Sessao>('monitoria', 'sessao');
 export const consultaFaltas = () => pesquisa<Falta>('monitoria', 'falta');

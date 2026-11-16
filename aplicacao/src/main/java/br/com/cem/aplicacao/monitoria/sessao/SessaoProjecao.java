@@ -9,6 +9,7 @@ import dev.sauloaraujo.d5.framework.aplicacao.IProjecao;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 public record SessaoProjecao(
 		SessaoIdentificador identificador,
@@ -16,9 +17,11 @@ public record SessaoProjecao(
 		UsuarioIdentificador professor,
 		UsuarioIdentificador monitor,
 		CampusIdentificador campus,
+		String sala,
 		LocalDateTime inicio,
 		LocalDateTime fim,
-		boolean cancelada)
+		boolean cancelada,
+		@Nullable LocalDateTime inicioAnterior)
 		implements IProjecao<Sessao> {
 	public SessaoProjecao {
 		Objects.requireNonNull(identificador);
@@ -26,6 +29,7 @@ public record SessaoProjecao(
 		Objects.requireNonNull(professor);
 		Objects.requireNonNull(monitor);
 		Objects.requireNonNull(campus);
+		Objects.requireNonNull(sala);
 		Objects.requireNonNull(inicio);
 		Objects.requireNonNull(fim);
 	}
@@ -36,17 +40,21 @@ public record SessaoProjecao(
 			Long professor,
 			Long monitor,
 			Long campus,
+		String sala,
 			LocalDateTime inicio,
 			LocalDateTime fim,
-			boolean cancelada) {
+		boolean cancelada,
+		@Nullable LocalDateTime inicioAnterior) {
 		this(
 				new SessaoIdentificador(identificador.toString()),
 				disciplina,
 				new UsuarioIdentificador(professor.toString()),
 				new UsuarioIdentificador(monitor.toString()),
 				new CampusIdentificador(campus.toString()),
+				sala,
 				inicio,
 				fim,
-				cancelada);
+				cancelada,
+				inicioAnterior);
 	}
 }
