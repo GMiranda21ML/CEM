@@ -12,6 +12,7 @@ import br.com.cem.infraestrutura.monitoria.sessao.ISessaoRepositorioJpa;
 import dev.sauloaraujo.d5.framework.dominio.AgregadoInexistenteExcecao;
 import dev.sauloaraujo.d5.framework.infraestrutura.AgregadoRepositorioAbstrato;
 
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -108,5 +109,13 @@ public class FaltaRepositorio
 				Long.valueOf(pessoa.toString()),
 				Objects.requireNonNull(papel),
 				Objects.requireNonNull(disciplina));
+	}
+
+	@Override
+	public Collection<Falta> listarPorDisciplina(String disciplina) {
+		Objects.requireNonNull(disciplina);
+		return repositorioJpa.listarPorDisciplina(disciplina).stream()
+				.map(this::paraAgregado)
+				.toList();
 	}
 }

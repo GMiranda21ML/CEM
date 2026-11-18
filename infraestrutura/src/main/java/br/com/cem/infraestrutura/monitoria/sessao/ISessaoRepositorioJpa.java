@@ -19,6 +19,10 @@ public interface ISessaoRepositorioJpa extends JpaRepository<SessaoJpa, Long> {
 	@Query("select count(s) > 0 from SessaoJpa s where s.monitor.identificador = :monitor")
 	boolean existePorMonitor(Long monitor);
 
+	@EntityGraph(attributePaths = {"alunos", "respostas"})
+	@Query("select s from SessaoJpa s where lower(s.disciplina) = lower(:disciplina)")
+	List<SessaoJpa> listarPorDisciplina(String disciplina);
+
 	@Override
 	@EntityGraph(attributePaths = {"alunos", "respostas"})
 	Optional<SessaoJpa> findById(Long identificador);

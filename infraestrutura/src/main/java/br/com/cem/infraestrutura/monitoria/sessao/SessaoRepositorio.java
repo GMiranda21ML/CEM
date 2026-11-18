@@ -14,6 +14,7 @@ import dev.sauloaraujo.d5.framework.dominio.AgregadoInexistenteExcecao;
 import dev.sauloaraujo.d5.framework.infraestrutura.AgregadoRepositorioAbstrato;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -28,6 +29,14 @@ public class SessaoRepositorio
 	public boolean existePorMonitor(UsuarioIdentificador monitor) {
 		Objects.requireNonNull(monitor);
 		return repositorioJpa.existePorMonitor(Long.valueOf(monitor.toString()));
+	}
+
+	@Override
+	public Collection<Sessao> listarPorDisciplina(String disciplina) {
+		Objects.requireNonNull(disciplina);
+		return repositorioJpa.listarPorDisciplina(disciplina).stream()
+				.map(this::paraAgregado)
+				.toList();
 	}
 
 	public SessaoRepositorio(
@@ -86,7 +95,7 @@ public class SessaoRepositorio
 						Objects.requireNonNull(a.getMonitor().getIdentificador()).toString()),
 				new CampusIdentificador(
 						Objects.requireNonNull(a.getCampus().getIdentificador()).toString()),
-				a.getSala(),
+				Objects.requireNonNullElse(a.getSala(), "Sala não informada"),
 				a.getAlunos().stream()
 						.map(
 								u ->

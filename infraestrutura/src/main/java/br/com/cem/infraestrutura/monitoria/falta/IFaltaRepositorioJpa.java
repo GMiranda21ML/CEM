@@ -8,7 +8,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface IFaltaRepositorioJpa extends JpaRepository<FaltaJpa, Long> {
+	@Query("select a from FaltaJpa a where lower(a.sessao.disciplina) = lower(:disciplina)")
+	List<FaltaJpa> listarPorDisciplina(String disciplina);
 	@Query(
 """
 select new br.com.cem.aplicacao.monitoria.falta.FaltaProjecao(a.identificador, a.sessao.identificador, a.pessoa.identificador, a.papel, a.autor.identificador, a.observacao, a.registradaEm, reposicao.identificador) from FaltaJpa a left join a.reposicao reposicao where (:coordenador = true or a.autor.identificador = :usuario or a.sessao.monitor.identificador = :usuario or a.sessao.professor.identificador = :usuario or (a.papel = 'MONITOR' and exists (select 1 from SessaoJpa s join s.alunos u where s=a.sessao and u.identificador=:usuario))) and (:texto is null or lower(a.observacao) like :texto escape '\\')
