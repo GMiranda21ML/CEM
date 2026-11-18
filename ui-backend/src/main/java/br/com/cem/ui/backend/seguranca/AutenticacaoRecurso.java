@@ -35,6 +35,11 @@ public class AutenticacaoRecurso extends AutenticacaoRecursoAbstrato {
 	private final br.com.cem.dominio.monitoria.sessao.SessaoAutorizacoes sessao;
 	private final AgregadoAutorizacoes<br.com.cem.dominio.monitoria.disponibilidade.Disponibilidade>
 			disponibilidade;
+	private final br.com.cem.dominio.monitoria.selecao.SelecaoAutorizacoes selecao;
+	private final br.com.cem.dominio.monitoria.candidatura.CandidaturaAutorizacoes candidatura;
+	private final br.com.cem.dominio.monitoria.acompanhamento.AcompanhamentoAutorizacoes
+			acompanhamento;
+	private final br.com.cem.dominio.monitoria.feedback.FeedbackAutorizacoes feedback;
 
 	public AutenticacaoRecurso(
 			String usuarioAutenticado,
@@ -54,7 +59,11 @@ public class AutenticacaoRecurso extends AutenticacaoRecursoAbstrato {
 			br.com.cem.dominio.monitoria.alerta.AlertaAutorizacoes alerta,
 			br.com.cem.dominio.monitoria.sessao.SessaoAutorizacoes sessao,
 			AgregadoAutorizacoes<br.com.cem.dominio.monitoria.disponibilidade.Disponibilidade>
-					disponibilidade) {
+					disponibilidade,
+			br.com.cem.dominio.monitoria.selecao.SelecaoAutorizacoes selecao,
+			br.com.cem.dominio.monitoria.candidatura.CandidaturaAutorizacoes candidatura,
+			br.com.cem.dominio.monitoria.acompanhamento.AcompanhamentoAutorizacoes acompanhamento,
+			br.com.cem.dominio.monitoria.feedback.FeedbackAutorizacoes feedback) {
 		super(usuarioAutenticado);
 
 		this.autorizacoes = Objects.requireNonNull(autorizacoes);
@@ -73,6 +82,10 @@ public class AutenticacaoRecurso extends AutenticacaoRecursoAbstrato {
 		this.alerta = Objects.requireNonNull(alerta);
 		this.sessao = Objects.requireNonNull(sessao);
 		this.disponibilidade = Objects.requireNonNull(disponibilidade);
+		this.selecao = Objects.requireNonNull(selecao);
+		this.candidatura = Objects.requireNonNull(candidatura);
+		this.acompanhamento = Objects.requireNonNull(acompanhamento);
+		this.feedback = Objects.requireNonNull(feedback);
 	}
 
 	public AgregadoAutorizacoes<br.com.cem.dominio.comunicacao.faq.Faq> getFaq() {
@@ -102,6 +115,23 @@ public class AutenticacaoRecurso extends AutenticacaoRecursoAbstrato {
 	public AgregadoAutorizacoes<br.com.cem.dominio.monitoria.disponibilidade.Disponibilidade>
 			getDisponibilidade() {
 		return disponibilidade;
+	}
+
+	public br.com.cem.dominio.monitoria.selecao.SelecaoAutorizacoes getSelecao() {
+		return selecao;
+	}
+
+	public br.com.cem.dominio.monitoria.candidatura.CandidaturaAutorizacoes getCandidatura() {
+		return candidatura;
+	}
+
+	public br.com.cem.dominio.monitoria.acompanhamento.AcompanhamentoAutorizacoes
+			getAcompanhamento() {
+		return acompanhamento;
+	}
+
+	public br.com.cem.dominio.monitoria.feedback.FeedbackAutorizacoes getFeedback() {
+		return feedback;
 	}
 
 	public List<String> getAutorizacoes() {

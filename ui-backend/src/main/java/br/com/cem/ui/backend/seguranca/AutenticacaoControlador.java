@@ -38,6 +38,12 @@ public class AutenticacaoControlador extends AutenticacaoControladorAbstrato {
 	private final br.com.cem.dominio.monitoria.sessao.SessaoServico sessaoServico;
 	private final br.com.cem.dominio.monitoria.disponibilidade.DisponibilidadeServico
 			disponibilidadeServico;
+	private final br.com.cem.dominio.monitoria.selecao.SelecaoServico selecaoServico;
+	private final br.com.cem.dominio.monitoria.candidatura.CandidaturaServico
+			candidaturaServico;
+	private final br.com.cem.dominio.monitoria.acompanhamento.AcompanhamentoServico
+			acompanhamentoServico;
+	private final br.com.cem.dominio.monitoria.feedback.FeedbackServico feedbackServico;
 
 	public AutenticacaoControlador(
 			ISegurancaServico segurancaServico,
@@ -56,7 +62,12 @@ public class AutenticacaoControlador extends AutenticacaoControladorAbstrato {
 			br.com.cem.dominio.monitoria.alerta.AlertaServico alertaServico,
 			br.com.cem.dominio.monitoria.sessao.SessaoServico sessaoServico,
 			br.com.cem.dominio.monitoria.disponibilidade.DisponibilidadeServico
-					disponibilidadeServico) {
+					disponibilidadeServico,
+			br.com.cem.dominio.monitoria.selecao.SelecaoServico selecaoServico,
+			br.com.cem.dominio.monitoria.candidatura.CandidaturaServico candidaturaServico,
+			br.com.cem.dominio.monitoria.acompanhamento.AcompanhamentoServico
+					acompanhamentoServico,
+			br.com.cem.dominio.monitoria.feedback.FeedbackServico feedbackServico) {
 		super(segurancaServico);
 
 		this.dominioEmailServico = Objects.requireNonNull(dominioEmailServico);
@@ -74,6 +85,10 @@ public class AutenticacaoControlador extends AutenticacaoControladorAbstrato {
 		this.alertaServico = Objects.requireNonNull(alertaServico);
 		this.sessaoServico = Objects.requireNonNull(sessaoServico);
 		this.disponibilidadeServico = Objects.requireNonNull(disponibilidadeServico);
+		this.selecaoServico = Objects.requireNonNull(selecaoServico);
+		this.candidaturaServico = Objects.requireNonNull(candidaturaServico);
+		this.acompanhamentoServico = Objects.requireNonNull(acompanhamentoServico);
+		this.feedbackServico = Objects.requireNonNull(feedbackServico);
 	}
 
 	@Override
@@ -103,6 +118,10 @@ public class AutenticacaoControlador extends AutenticacaoControladorAbstrato {
 				faltaServico.criarAutorizacoes(Optional.empty()),
 				alertaServico.criarAutorizacoes(Optional.empty()),
 				sessaoServico.criarAutorizacoes(Optional.empty()),
-				disponibilidadeServico.criarAutorizacoes(Optional.empty()));
+				disponibilidadeServico.criarAutorizacoes(Optional.empty()),
+				selecaoServico.criarAutorizacoes(Optional.empty()),
+				candidaturaServico.criarAutorizacoes(Optional.empty()),
+				acompanhamentoServico.criarAutorizacoes(Optional.empty()),
+				feedbackServico.criarAutorizacoes(Optional.empty()));
 	}
 }
