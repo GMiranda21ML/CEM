@@ -101,3 +101,98 @@ Ref: SSR_SESSAO_RESPOSTA.SES_ID > SES_SESSAO.SES_ID
 Ref: SSR_SESSAO_RESPOSTA.USR_ID > USR_USUARIO.USR_ID
 Ref: FLT_FALTA.SES_ID > SES_SESSAO.SES_ID
 Ref: FLT_FALTA.SES_REPOSICAO_ID > SES_SESSAO.SES_ID
+
+// Funcionalidades F006 e F013
+Enum SITUACAO_SELECAO {
+  ABERTA
+  ENCERRADA
+}
+
+Enum SITUACAO_CANDIDATURA {
+  PENDENTE
+  APROVADA
+  REPROVADA
+  CANCELADA
+}
+
+Enum SITUACAO_ACOMPANHAMENTO {
+  ATIVO
+  ENCERRADO
+}
+
+Table SEL_SELECAO {
+  SEL_ID bigint [pk, increment]
+  DSC_ID bigint [not null]
+  USR_ID bigint [not null, note: 'Professor responsável pela seleção']
+  SEL_SEMESTRE varchar(10) [not null]
+  SEL_PRAZO_INSCRICAO date [not null]
+  SEL_VAGAS integer [not null]
+  SEL_CR_MINIMO double [not null]
+  SEL_PESO_CR integer [not null]
+  SEL_PESO_ENTREVISTA integer [not null]
+  SEL_PATAMAR_MINIMO double [not null]
+  SEL_SITUACAO SITUACAO_SELECAO [not null]
+  SEL_MOTIVO_ENCERRAMENTO varchar(100)
+  SEL_ABERTA_EM date [not null]
+  SEL_ENCERRADA_EM date
+
+  indexes {
+    (DSC_ID, SEL_SITUACAO) [note: 'Consulta de seleção aberta por disciplina']
+  }
+}
+
+Table CND_CANDIDATURA {
+  CND_ID bigint [pk, increment]
+  SEL_ID bigint [not null]
+  DSC_ID bigint [not null]
+  USR_ID bigint [not null, note: 'Aluno candidato']
+  CND_CR double [not null]
+  CND_SITUACAO SITUACAO_CANDIDATURA [not null]
+  CND_NOTA_ENTREVISTA double
+  CND_COMENTARIO_ENTREVISTA varchar(1000)
+  CND_RESULTADO_FINAL double
+  CND_MOTIVO_DECISAO varchar(250)
+  CND_CRIADA_EM datetime [not null]
+  CND_DECIDIDA_EM date
+
+  indexes {
+    SEL_ID
+    (USR_ID, DSC_ID, CND_SITUACAO) [note: 'Verificação de candidatura ativa e vínculo de monitor']
+  }
+}
+
+Table ACM_ACOMPANHAMENTO {
+  ACM_ID bigint [pk, increment]
+  ACM_ALUNO_ID bigint [not null]
+  DSC_ID bigint [not null]
+  ACM_MONITOR_ID bigint [not null]
+  ACM_SEMESTRE varchar(10) [not null]
+  ACM_META_NOTA double [not null]
+  ACM_META_FREQUENCIA integer [not null]
+  ACM_SITUACAO SITUACAO_ACOMPANHAMENTO [not null]
+  ACM_ABERTO_EM date [not null]
+  ACM_ENCERRADO_EM date
+  ACM_PARECER_FINAL varchar(1000)
+
+  indexes {
+    (ACM_ALUNO_ID, DSC_ID, ACM_SITUACAO) [note: 'Verificação de acompanhamento ativo por aluno e disciplina']
+  }
+}
+
+Table FDB_FEEDBACK {
+  FDB_ID bigint [pk, increment]
+  SES_ID bigint [not null]
+  FDB_ALUNO_ID bigint [not null]
+  FDB_AUTOR_ID bigint [not null]
+  FDB_NOTA double [not null]
+  FDB_COMENTARIO varchar(1000)
+  FDB_CRIADO_EM date [not null]
+  FDB_ATUALIZADO_EM date
+
+  indexes {
+    (SES_ID, FDB_ALUNO_ID) [unique, note: 'Um feedback por aluno e sessão']
+  }
+}
+
+Ref: CND_CANDIDATURA.SEL_ID > SEL_SELECAO.SEL_ID
+Ref: FDB_FEEDBACK.SES_ID > SES_SESSAO.SES_ID
