@@ -110,8 +110,7 @@ class FaltaAplicacaoRepositorioTest {
 						.getReposicao()
 						.isEmpty());
 		var seguranca = mock(ISegurancaServico.class);
-		when(seguranca.getUsuario()).thenReturn("aluno@aluno.cem.edu.br");
-		when(seguranca.possuiAutorizacao("COORDENADOR")).thenReturn(true);
+		when(seguranca.getUsuario()).thenReturn("monitor@aluno.cem.edu.br");
 		var relogio = mock(IRelogioServico.class);
 		when(relogio.agora()).thenReturn(agora);
 		var aplicacao =
@@ -128,5 +127,20 @@ class FaltaAplicacaoRepositorioTest {
 										Optional.of(100),
 										Optional.empty()))
 						.getTotal());
+		for (String texto : List.of("", "   ")) {
+			var resultado = aplicacao.pesquisar(new FaltaConsulta(
+					Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(100),
+					Optional.of(texto)));
+			assertEquals(1, resultado.getTotal(), "Busca vazia deve incluir faltas sem observação");
+			assertEquals(falta.getIdentificador().orElseThrow(), resultado.getProjecoes().getFirst().identificador());
+			assertTrue(resultado.getProjecoes().getFirst().observacao().isEmpty());
+		}
+		assertEquals(0, aplicacao.pesquisar(new FaltaConsulta(
+				Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(100),
+				Optional.of("ausência"))).getTotal());
+		when(seguranca.getUsuario()).thenReturn("aluno@aluno.cem.edu.br");
+		assertEquals(0, aplicacao.pesquisar(new FaltaConsulta(
+				Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(100),
+				Optional.of(""))).getTotal(), "Busca vazia não amplia a autorização do aluno");
 	}
 }

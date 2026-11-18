@@ -48,7 +48,7 @@ public class FaltaAplicacaoRepositorio
 								.getIdentificador()
 								.orElseThrow()
 								.toString()),
-				paraLike(consulta.getTexto()),
+				paraLike(consulta.getTexto().map(String::strip).filter(texto -> !texto.isEmpty())),
 				pageable);
 	}
 

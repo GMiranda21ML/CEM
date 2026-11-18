@@ -36,10 +36,14 @@ export const pesquisa = <T>(sub: string, agregado: string, texto = '', pagina = 
   queryOptions({
     queryKey: ['funcionalidades', sub, agregado, texto, pagina],
     queryFn: async () => {
-      const carregar = (indice: number) =>
-        chamarApi<Pesquisa<T>>(
-          `/backend/${sub}/${agregado}/pesquisa?texto=${encodeURIComponent(texto)}&indicePagina=${indice}&tamanhoPagina=100`,
-        );
+      const carregar = (indice: number) => {
+        const parametros = new URLSearchParams({
+          indicePagina: String(indice),
+          tamanhoPagina: '100',
+        });
+        if (texto.trim()) parametros.set('texto', texto.trim());
+        return chamarApi<Pesquisa<T>>(`/backend/${sub}/${agregado}/pesquisa?${parametros}`);
+      };
       const primeira = await carregar(pagina);
       if (pagina !== 0) return primeira;
       const projecoes = [...primeira.resultado.projecoes];

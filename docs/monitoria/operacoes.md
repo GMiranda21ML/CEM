@@ -6,6 +6,8 @@ Todas as operações exigem autenticação; POST também exige CSRF. As pesquisa
 
 Tela: `/monitoria/falta/pesquisa`. GET `/backend/monitoria/falta/pesquisa` respeita a participação e a autoria: monitor e professor veem as faltas de suas sessões; a coordenação pode acompanhá-las. Alunos também consultam relatos de ausência do monitor nas sessões a que estão vinculados.
 
+Sem busca, o frontend omite o parâmetro `texto`. Na pesquisa de faltas, `texto` ausente, vazio ou composto somente de espaços significa ausência de filtro, incluindo registros sem observação. Após registrar, editar ou excluir uma falta, a tela atualiza a tabela, os totais e as consultas de reposição. A tabela apresenta sessão, faltoso, autoria, observação opcional e a ação `Sugerir reposição` para faltas de aluno sem reposição ativa, conforme o protótipo.
+
 POST `/backend/monitoria/falta/registrar`:
 ```json
 {"sessao":"1","pessoa":"3","papel":"ALUNO","observacao":"Não compareceu."}
