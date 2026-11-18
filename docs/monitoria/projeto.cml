@@ -79,6 +79,7 @@ BoundedContext monitoria implements monitoria {
 					void excluir(@SessaoIdentificador identificador);
 					boolean conflita(@UsuarioIdentificador monitor, @UsuarioIdentificador aluno, DateTime inicio, DateTime fim);
 					void bloquearAgenda(@UsuarioIdentificador monitor);
+					Collection<@Sessao> listarPorDisciplina(String disciplina);
 				}
 			}
 			Service SessaoServico {
@@ -137,6 +138,7 @@ BoundedContext monitoria implements monitoria {
 					void excluir(@FaltaIdentificador identificador);
 					boolean existePorSessaoEPessoa(@SessaoIdentificador sessao, @UsuarioIdentificador pessoa);
 					long contar(@UsuarioIdentificador pessoa, String papel, String disciplina);
+					Collection<@Falta> listarPorDisciplina(String disciplina);
 				}
 			}
 			ValueObject FaltaIdentificador { String valor }
@@ -180,6 +182,222 @@ BoundedContext monitoria implements monitoria {
 				@Alerta buscar(@AlertaIdentificador identificador);
 				void acompanhar(@AlertaIdentificador identificador);
 				long contar(@AlertaIdentificador identificador);
+			}
+		}
+		// Funcionalidades F006 e F013
+		Aggregate Selecao {
+			Entity Selecao {
+				aggregateRoot
+
+				-SelecaoIdentificador identificador key
+				-DisciplinaIdentificador disciplina
+				-UsuarioIdentificador professor
+				String semestre
+				Date prazoInscricao
+				int vagas
+				double crMinimo
+				int pesoCr
+				int pesoEntrevista
+				double patamarMinimo
+				SelecaoSituacao situacao
+				nullable String motivoEncerramento
+				Date abertaEm
+				nullable Date encerradaEm
+
+				Repository SelecaoRepository {
+					@Selecao incluir(@Selecao agregado);
+					boolean existePorIdentificador(@SelecaoIdentificador identificador);
+					@Selecao buscarPorIdentificador(@SelecaoIdentificador identificador);
+					void alterar(@Selecao agregado);
+					boolean existeAbertaPorDisciplina(@DisciplinaIdentificador disciplina, @SelecaoIdentificador ignorado);
+				}
+			}
+
+			enum SelecaoSituacao {
+				ABERTA, ENCERRADA
+			}
+
+			// artificial
+			ValueObject SelecaoIdentificador {
+				String valor
+			}
+
+			Service SelecaoServico {
+				@Selecao buscar(@SelecaoIdentificador identificador);
+				@Selecao abrir(@DisciplinaIdentificador disciplina, Date prazoInscricao, int vagas, double crMinimo, int pesoCr, int pesoEntrevista, double patamarMinimo);
+				@Selecao editar(@SelecaoIdentificador identificador, Date prazoInscricao, int vagas, double crMinimo, int pesoCr, int pesoEntrevista, double patamarMinimo);
+				@Selecao encerrar(@SelecaoIdentificador identificador);
+			}
+		}
+
+		Aggregate Candidatura {
+			Entity Candidatura {
+				aggregateRoot
+
+				-CandidaturaIdentificador identificador key
+				-SelecaoIdentificador selecao
+				-DisciplinaIdentificador disciplina
+				-UsuarioIdentificador aluno
+				double cr
+				CandidaturaSituacao situacao
+				nullable double notaEntrevista
+				nullable String comentarioEntrevista
+				nullable double resultadoFinal
+				nullable String motivoDecisao
+				DateTime criadaEm
+				nullable Date decididaEm
+
+				Repository CandidaturaRepository {
+					@Candidatura incluir(@Candidatura agregado);
+					boolean existePorIdentificador(@CandidaturaIdentificador identificador);
+					@Candidatura buscarPorIdentificador(@CandidaturaIdentificador identificador);
+					void alterar(@Candidatura agregado);
+					boolean existePorSelecao(@SelecaoIdentificador selecao);
+					boolean existeAtivaPorAlunoEDisciplina(@UsuarioIdentificador aluno, @DisciplinaIdentificador disciplina);
+					long contarMonitoriasAtivasNoSemestre(@UsuarioIdentificador aluno, String semestre, @DisciplinaIdentificador disciplinaIgnorada);
+					boolean ehMonitorAtivo(@UsuarioIdentificador aluno, @DisciplinaIdentificador disciplina);
+					boolean ehMonitorEmAlgumaDisciplina(@UsuarioIdentificador aluno);
+					Collection<@Candidatura> listarPorSelecao(@SelecaoIdentificador selecao);
+				}
+			}
+
+			enum CandidaturaSituacao {
+				PENDENTE, APROVADA, REPROVADA, CANCELADA
+			}
+
+			// artificial
+			ValueObject CandidaturaIdentificador {
+				String valor
+			}
+
+			Service CandidaturaServico {
+				@Candidatura buscar(@CandidaturaIdentificador identificador);
+				@Candidatura candidatar(@SelecaoIdentificador selecao, double cr);
+				@Candidatura cancelar(@CandidaturaIdentificador identificador);
+				@Candidatura registrarEntrevista(@CandidaturaIdentificador identificador, double nota, String comentario);
+				@Candidatura aprovar(@CandidaturaIdentificador identificador);
+				@Candidatura reprovar(@CandidaturaIdentificador identificador);
+			}
+		}
+
+		Aggregate Acompanhamento {
+			Entity Acompanhamento {
+				aggregateRoot
+
+				-AcompanhamentoIdentificador identificador key
+				-UsuarioIdentificador aluno
+				-DisciplinaIdentificador disciplina
+				-UsuarioIdentificador monitor
+				String semestre
+				double metaNota
+				int metaFrequencia
+				AcompanhamentoSituacao situacao
+				Date abertoEm
+				nullable Date encerradoEm
+				nullable String parecerFinal
+
+				Repository AcompanhamentoRepository {
+					@Acompanhamento incluir(@Acompanhamento agregado);
+					boolean existePorIdentificador(@AcompanhamentoIdentificador identificador);
+					@Acompanhamento buscarPorIdentificador(@AcompanhamentoIdentificador identificador);
+					void alterar(@Acompanhamento agregado);
+					void excluir(@AcompanhamentoIdentificador identificador);
+					boolean existeAtivoPorAlunoEDisciplina(@UsuarioIdentificador aluno, @DisciplinaIdentificador disciplina);
+					boolean existeEncerradoPorAlunoEDisciplina(@UsuarioIdentificador aluno, @DisciplinaIdentificador disciplina);
+					boolean existeBloqueioPorEncerramento(@UsuarioIdentificador aluno, String disciplinaNomeOuCodigo, @UsuarioIdentificador professor);
+				}
+			}
+
+			enum AcompanhamentoSituacao {
+				ATIVO, ENCERRADO
+			}
+
+			enum TendenciaEvolucao {
+				EM_EVOLUCAO, EM_QUEDA, ESTAVEL, DADOS_INSUFICIENTES
+			}
+
+			enum SituacaoDesempenho {
+				META_ATINGIDA, EM_PROGRESSO, ESTAVEL, ATENCAO, DADOS_INSUFICIENTES
+			}
+
+			ValueObject AcompanhamentoIdentificador {
+				String valor
+			}
+
+			ValueObject SessaoRelatorioItem {
+				-SessaoIdentificador sessao
+				Date data
+				String situacao
+				boolean valida
+				boolean presente
+				nullable double nota
+				nullable String comentario
+			}
+
+			ValueObject RelatorioDesempenho {
+				-AcompanhamentoIdentificador acompanhamento
+				nullable Date de
+				nullable Date ate
+				boolean filtroIgnorado
+				int totalSessoesValidas
+				int totalPresencas
+				nullable double frequenciaPercentual
+				int quantidadeNotas
+				nullable double mediaNotas
+				nullable double notaInicial
+				nullable double notaAtual
+				nullable double variacaoNotas
+				nullable double inclinacaoTendencia
+				TendenciaEvolucao tendencia
+				SituacaoDesempenho situacao
+				List<SessaoRelatorioItem> sessoes
+			}
+
+			Service AcompanhamentoServico {
+				@Acompanhamento buscar(@AcompanhamentoIdentificador identificador);
+				@Acompanhamento abrir(@UsuarioIdentificador aluno, @DisciplinaIdentificador disciplina, double metaNota, int metaFrequencia);
+				@Acompanhamento editarMetas(@AcompanhamentoIdentificador identificador, double metaNota, int metaFrequencia);
+				@Acompanhamento encerrar(@AcompanhamentoIdentificador identificador, String parecerFinal);
+				void excluir(@AcompanhamentoIdentificador identificador);
+				@RelatorioDesempenho emitirRelatorio(@AcompanhamentoIdentificador identificador, Date de, Date ate);
+			}
+		}
+
+		Aggregate Feedback {
+			Entity Feedback {
+				aggregateRoot
+
+				-FeedbackIdentificador identificador key
+				-SessaoIdentificador sessao
+				-UsuarioIdentificador aluno
+				-UsuarioIdentificador autor
+				double nota
+				nullable String comentario
+				Date criadoEm
+				nullable Date atualizadoEm
+
+				Repository FeedbackRepository {
+					@Feedback incluir(@Feedback agregado);
+					boolean existePorIdentificador(@FeedbackIdentificador identificador);
+					@Feedback buscarPorIdentificador(@FeedbackIdentificador identificador);
+					void alterar(@Feedback agregado);
+					void excluir(@FeedbackIdentificador identificador);
+					boolean existePorSessaoEAluno(@SessaoIdentificador sessao, @UsuarioIdentificador aluno);
+					boolean existePorAlunoEDisciplina(@UsuarioIdentificador aluno, @DisciplinaIdentificador disciplina);
+					List<@Feedback> listarPorAlunoEDisciplina(@UsuarioIdentificador aluno, @DisciplinaIdentificador disciplina);
+				}
+			}
+
+			// artificial
+			ValueObject FeedbackIdentificador {
+				String valor
+			}
+
+			Service FeedbackServico {
+				@Feedback buscar(@FeedbackIdentificador identificador);
+				@Feedback registrar(@SessaoIdentificador sessao, @UsuarioIdentificador aluno, double nota, String comentario);
+				@Feedback editar(@FeedbackIdentificador identificador, double nota, String comentario);
+				void excluir(@FeedbackIdentificador identificador);
 			}
 		}
 	}
