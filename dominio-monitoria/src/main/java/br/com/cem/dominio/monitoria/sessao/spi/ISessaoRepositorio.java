@@ -7,11 +7,18 @@ import br.com.cem.dominio.monitoria.sessao.SessaoIdentificador;
 import dev.sauloaraujo.d5.framework.dominio.spi.IAgregadoRepositorio;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 public interface ISessaoRepositorio extends IAgregadoRepositorio<SessaoIdentificador, Sessao> {
 	boolean existePorMonitor(UsuarioIdentificador monitor);
+
+	default Collection<Sessao> listarPorDisciplina(String disciplina) {
+		Objects.requireNonNull(disciplina);
+		return List.of();
+	}
 
 	boolean conflita(
 			UsuarioIdentificador monitor,
