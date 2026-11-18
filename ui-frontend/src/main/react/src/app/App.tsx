@@ -94,6 +94,42 @@ export function App() {
                   {autorizacoesDe('alerta')?.buscar && (
                     <ItemMenu caminho="/monitoria/alerta/pesquisa">Alertas de faltas</ItemMenu>
                   )}
+                  {autorizacoesDe('selecao')?.buscar && (
+                    <ItemMenu caminho="/monitoria/selecao/pesquisa">Seleções de monitoria</ItemMenu>
+                  )}
+                  {autorizacoesDe('candidatura')?.buscar &&
+                    ((autorizacoesDe('candidatura') as { aprovar?: boolean } | undefined)?.aprovar ? (
+                      <ItemMenu caminho="/monitoria/candidatura/avaliacao">
+                        Avaliar candidaturas
+                      </ItemMenu>
+                    ) : (
+                      <ItemMenu caminho="/monitoria/candidatura/pesquisa">Candidaturas</ItemMenu>
+                    ))}
+                  {autorizacoesDe('acompanhamento')?.buscar && (
+                    <>
+                      <ItemMenu caminho="/monitoria/acompanhamento/pesquisa">
+                        Acompanhamentos
+                      </ItemMenu>
+                      <ItemMenu caminho="/monitoria/acompanhamento/relatorios">
+                        {(autorizacoesDe('acompanhamento') as {
+                          abrir?: boolean;
+                          editarMetas?: boolean;
+                        } | undefined)?.abrir ||
+                        (autorizacoesDe('acompanhamento') as {
+                          abrir?: boolean;
+                          editarMetas?: boolean;
+                        } | undefined)?.editarMetas ||
+                        autorizacoes.includes('COORDENADOR')
+                          ? 'Relatórios de desempenho'
+                          : 'Meu desempenho'}
+                      </ItemMenu>
+                    </>
+                  )}
+                  {autorizacoesDe('feedback')?.buscar && (
+                    <ItemMenu caminho="/monitoria/feedback/pesquisa">
+                      Feedback por sessão
+                    </ItemMenu>
+                  )}
                 </>
               )}
             </nav>

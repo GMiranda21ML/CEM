@@ -782,3 +782,186 @@ code {
     line-height: 1.8;
   }
 }
+
+
+/* seleções, acompanhamentos e relatório de desempenho (F006 e F013) */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.kpi-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+}
+
+.kpi-card > small {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #708295;
+  margin-bottom: 6px;
+}
+
+.kpi-card > b {
+  display: block;
+  font-size: clamp(22px, 2vw, 28px);
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  line-height: 1.15;
+}
+
+.kpi-card > span {
+  display: block;
+  margin-top: 6px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.progress-track {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  background: #e9f0f4;
+  overflow: visible;
+  margin-top: 10px;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #0ea99d, #067b73);
+  transition: width 0.25s ease;
+}
+
+.progress-fill.alerta {
+  background: linear-gradient(90deg, #e07b53, #b54545);
+}
+
+.progress-meta {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  background: #132238;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.chart-box {
+  background: #fbfdfe;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.chart-box h3 {
+  margin: 0 0 4px;
+  font-size: 14.5px;
+}
+
+.chart-box svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-top: 10px;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.chart-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.item-card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 18px;
+  background: #fff;
+}
+
+.item-card + .item-card {
+  margin-top: 12px;
+}
+
+.item-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.checklist {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.checklist li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checklist .ok {
+  color: #1f7a53;
+  font-weight: 700;
+}
+
+.checklist .falha {
+  color: #a23b44;
+  font-weight: 700;
+}
+
+@media print {
+  .sidebar,
+  .topbar,
+  .site-footer,
+  .no-print {
+    display: none !important;
+  }
+
+  .app-shell {
+    display: block;
+  }
+
+  main {
+    max-width: none;
+    padding: 0;
+  }
+
+  .panel,
+  .kpi-card,
+  .chart-box {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}

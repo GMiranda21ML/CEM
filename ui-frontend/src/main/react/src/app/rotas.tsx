@@ -66,6 +66,55 @@ export const rotas = [
               return { Component: modulo.AgendaDeReposicao, loader: modulo.loader };
             },
           },
+          {
+            path: 'monitoria/selecao/pesquisa',
+            lazy: async () => {
+              const modulo = await import('./monitoria/selecao/MinhasSelecoes');
+              return { Component: modulo.MinhasSelecoes, loader: modulo.loader };
+            },
+          },
+          {
+            path: 'monitoria/candidatura/pesquisa',
+            lazy: async () => {
+              const modulo = await import('./monitoria/candidatura/SelecoesDeMonitoria');
+              return { Component: modulo.SelecoesDeMonitoria, loader: modulo.loader };
+            },
+          },
+          {
+            path: 'monitoria/candidatura/avaliacao',
+            lazy: async () => {
+              const modulo = await import('./monitoria/candidatura/AvaliarCandidaturas');
+              return { Component: modulo.AvaliarCandidaturas, loader: modulo.loader };
+            },
+          },
+          {
+            path: 'monitoria/acompanhamento/pesquisa',
+            lazy: async () => {
+              const modulo = await import('./monitoria/acompanhamento/Acompanhamentos');
+              return { Component: modulo.Acompanhamentos, loader: modulo.loader };
+            },
+          },
+          {
+            path: 'monitoria/acompanhamento/relatorios',
+            lazy: async () => {
+              const modulo = await import('./monitoria/acompanhamento/RelatoriosDeDesempenho');
+              return { Component: modulo.RelatoriosDeDesempenho, loader: modulo.loader };
+            },
+          },
+          {
+            path: 'monitoria/acompanhamento/meu-desempenho',
+            lazy: async () => {
+              const modulo = await import('./monitoria/acompanhamento/RelatoriosDeDesempenho');
+              return { Component: modulo.RelatoriosDeDesempenho, loader: modulo.loader };
+            },
+          },
+          {
+            path: 'monitoria/feedback/pesquisa',
+            lazy: async () => {
+              const modulo = await import('./monitoria/feedback/FeedbackDosAlunos');
+              return { Component: modulo.FeedbackDosAlunos, loader: modulo.loader };
+            },
+          },
           { index: true, element: <Navigate to="/inicio" replace /> },
           {
             path: 'inicio',
